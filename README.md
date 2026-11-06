@@ -26,3 +26,9 @@ De propósito **não** mexe em firmware, reset de fábrica, calibração ou macr
 - `protocol.js`: o protocolo (formato do pacote, checksum e cada comando), comentado
 - `layouts.js`: posição das teclas de cada modelo, extraída do app oficial
 - `index.html`: a interface
+
+## Aviso
+
+Projeto pessoal e não oficial, sem ligação com a Aula. Feito para usar o próprio teclado
+(interoperabilidade). Use por sua conta e risco. Os nomes de modelos e a posição das teclas
+vêm do configurador público da fabricante.
