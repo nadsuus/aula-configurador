@@ -6,266 +6,701 @@
 <title>Configurador Aula HERO</title>
 <style>
   :root {
-    --bg: #f6f6f4; --card: #ffffff; --text: #1d1d1b; --muted: #6b6b66; --line: #deded8;
-    --accent: #2d6cdf; --accent-text: #ffffff; --key: #ececE7; --key-sel: #2d6cdf; --ok: #1f8a4c; --err: #c0392b;
+    --bg: #eef0f3; --panel: #f7f8fa; --card: #ffffff; --text: #1d1f23; --muted: #6b7079; --line: #dde1e7;
+    --side: #262a33; --side-2: #323743; --side-text: #e9ebef; --side-muted: #9aa1ad;
+    --accent: #1f6fd1; --accent-soft: #e3eefb; --purple: #7b3fe4;
+    --key: #e6edf5; --key-line: #c4ccd8; --key-sel: #f39c12; --ok: #1f9d55; --err: #d93a2b;
+    --live: #1f6fd1; --live-on: #e8590c; --done: #8fd3a8;
   }
   @media (prefers-color-scheme: dark) {
-    :root { --bg: #151514; --card: #1f1f1d; --text: #ededea; --muted: #9a9a93; --line: #34342f;
-      --accent: #5b8ff0; --key: #2c2c29; --key-sel: #5b8ff0; --ok: #4cc27f; --err: #ef6f61; }
+    :root { --bg: #15171b; --panel: #1b1e23; --card: #22262c; --text: #e9ebef; --muted: #9aa1ad; --line: #343943;
+      --side: #101215; --side-2: #1d2026; --accent: #4d8ff0; --accent-soft: #1d2b40; --purple: #9b6cf0;
+      --key: #2b3038; --key-line: #3d434e; --live: #4d8ff0; --live-on: #ff8a3d; --done: #2f6b46; }
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 system-ui, sans-serif; }
-  main { max-width: 1040px; margin: 0 auto; padding: 24px 16px 64px; }
-  h1 { font-size: 22px; margin: 0 0 4px; }
-  h2 { font-size: 16px; margin: 0 0 12px; }
-  .sub { color: var(--muted); margin: 0 0 20px; }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
-  .row { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; }
-  label { display: flex; gap: 8px; align-items: center; }
-  .field { display: grid; gap: 4px; min-width: 180px; }
-  .field span { color: var(--muted); font-size: 13px; }
-  select, input[type=number] { font: inherit; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--card); color: var(--text); }
-  input[type=range] { width: 220px; accent-color: var(--accent); }
-  button { font: inherit; padding: 8px 14px; border-radius: 6px; border: 1px solid var(--line); background: var(--card); color: var(--text); cursor: pointer; }
-  button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
-  button:disabled { opacity: .5; cursor: default; }
-  #status { font-size: 14px; }
-  #status.ok { color: var(--ok); } #status.err { color: var(--err); }
+  html, body { height: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, sans-serif; }
+  button { font: inherit; cursor: pointer; }
+  button:disabled { opacity: .45; cursor: default; }
   .hidden { display: none !important; }
-  .kbwrap { overflow-x: auto; margin: 12px 0; }
-  #kb { position: relative; }
-  .key { position: absolute; border-radius: 5px; background: var(--key); border: 1px solid var(--line);
-    font-size: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    cursor: pointer; user-select: none; overflow: hidden; text-align: center; line-height: 1.1; }
-  .key b { font-weight: 600; font-size: 10px; }
-  .key i { font-style: normal; color: var(--muted); font-size: 9px; }
-  .key.sel { background: var(--key-sel); color: var(--accent-text); border-color: var(--key-sel); }
-  .key.sel i { color: var(--accent-text); }
-  pre#log { max-height: 220px; overflow: auto; font: 12px/1.4 ui-monospace, monospace; background: var(--bg); padding: 8px; border-radius: 6px; margin: 8px 0 0; }
-  .val { font-variant-numeric: tabular-nums; min-width: 64px; display: inline-block; }
+
+  /* Estrutura: barra lateral + area principal */
+  .app { display: grid; grid-template-columns: 230px 1fr; gap: 10px; padding: 10px; min-height: 100%; }
+  @media (max-width: 820px) { .app { grid-template-columns: 1fr; } }
+  aside { background: var(--side); color: var(--side-text); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 14px; }
+  .dev { background: var(--side-2); border-radius: 6px; padding: 12px; text-align: center; font-size: 13px; }
+  .dev .name { font-weight: 600; font-size: 15px; }
+  .dev .st { color: var(--side-muted); }
+  .dev .st.on { color: #4cd685; }
+  .side-title { font-size: 15px; margin: 4px 0 0; }
+  .profiles { display: grid; gap: 8px; }
+  .profiles button { text-align: left; padding: 12px; border-radius: 6px; border: 1px solid transparent; background: var(--side-2); color: var(--side-text); }
+  .profiles button.active { background: #0c0d10; border-color: var(--accent); }
+  .side-foot { margin-top: auto; display: grid; gap: 8px; }
+  .side-foot button { padding: 9px; border-radius: 6px; border: 0; background: var(--side-2); color: var(--side-text); }
+  .side-foot label { color: var(--side-muted); display: flex; gap: 8px; align-items: center; font-size: 13px; }
+
+  .main { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  nav.tabs { display: flex; background: var(--card); border: 1px solid var(--line); border-radius: 8px; overflow-x: auto; }
+  nav.tabs button { flex: 1; min-width: 110px; padding: 10px 6px 8px; background: none; border: 0; border-bottom: 2px solid transparent; color: var(--text);
+    display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 13px; letter-spacing: .02em; }
+  nav.tabs button svg { width: 16px; height: 16px; }
+  nav.tabs button.active { border-bottom-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+
+  /* Palco do teclado */
+  .stage { position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 22px 16px 16px; }
+  .stage-row { display: flex; gap: 16px; align-items: center; justify-content: center; }
+  .kbwrap { overflow-x: auto; flex: 1; display: flex; justify-content: center; }
+  #kb { position: relative; flex: none; }
+  .key { position: absolute; border-radius: 5px; background: var(--key); border: 1px solid var(--key-line); box-shadow: inset 0 -3px 0 rgba(0,0,0,.08);
+    font-size: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; user-select: none; overflow: hidden; text-align: center; line-height: 1.1; }
+  .key.click { cursor: pointer; }
+  .key b { font-weight: 600; font-size: 10px; position: relative; }
+  .key i { font-style: normal; color: var(--muted); font-size: 9px; position: relative; font-weight: 600; }
+  .key .fill { position: absolute; left: 0; right: 0; bottom: 0; height: 0; background: var(--live); opacity: .75; transition: height 40ms linear; }
+  .key.on .fill { background: var(--live-on); }
+  .key.done { background: var(--done); border-color: var(--done); }
+  .key.sel { outline: 2px solid var(--key-sel); outline-offset: -2px; }
+  .key.rt::after { content: ""; position: absolute; top: 3px; right: 3px; width: 6px; height: 6px; border-radius: 50%; background: var(--purple); }
+  .stage-side { display: grid; gap: 8px; width: 130px; }
+  .stage-side button { padding: 8px; border: 0; border-radius: 4px; background: var(--purple); color: #fff; }
+  .seg { display: inline-flex; border: 1px solid var(--accent); border-radius: 999px; overflow: hidden; margin: 16px auto 0; }
+  .seg button { border: 0; padding: 7px 16px; background: var(--card); color: var(--accent); font-size: 13px; }
+  .seg button.active { background: var(--accent); color: #fff; }
+  .seg-wrap { text-align: center; }
+  .legend { text-align: center; color: var(--muted); font-size: 12px; margin-top: 10px; }
+  .legend .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--purple); margin-right: 4px; }
+  .banner { display: flex; gap: 12px; align-items: center; justify-content: center; flex-wrap: wrap; margin-top: 14px; }
+  .banner .info { font-variant-numeric: tabular-nums; }
+  .warn { color: var(--err); }
+
+  /* Paineis de baixo */
+  .panels { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+  .panels > section { padding: 18px 20px; border-right: 1px solid var(--line); min-width: 0; }
+  .panels > section:last-child { border-right: 0; }
+  @media (max-width: 1100px) { .panels { grid-template-columns: 1fr; } .panels > section { border-right: 0; border-bottom: 1px solid var(--line); } }
+  .ph { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; border-bottom: 1px solid var(--line); padding-bottom: 10px; margin-bottom: 14px; }
+  .ph h3 { margin: 0; font-size: 17px; }
+  .ph p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+  .note { color: var(--muted); font-size: 12px; }
+
+  .btn { padding: 8px 14px; border-radius: 4px; border: 1px solid var(--line); background: var(--card); color: var(--text); }
+  .btn.blue { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.purple { background: var(--purple); border-color: var(--purple); color: #fff; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+  /* Interruptor */
+  .sw { position: relative; display: inline-block; width: 36px; height: 20px; flex: none; }
+  .sw input { opacity: 0; width: 0; height: 0; }
+  .sw span { position: absolute; inset: 0; border-radius: 999px; background: #b9c0cb; transition: .15s; cursor: pointer; }
+  .sw span::after { content: ""; position: absolute; width: 16px; height: 16px; top: 2px; left: 2px; border-radius: 50%; background: #fff; transition: .15s; }
+  .sw input:checked + span { background: var(--accent); }
+  .sw input:checked + span::after { transform: translateX(16px); }
+
+  /* Slider horizontal com - e + */
+  .hs { display: grid; grid-template-columns: auto 1fr auto auto; gap: 8px; align-items: center; margin: 4px 0 14px; }
+  .hs input { width: 100%; accent-color: var(--accent); }
+  .pm { width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--line); background: var(--card); color: var(--text); line-height: 1; padding: 0; }
+  .v { font-variant-numeric: tabular-nums; min-width: 62px; text-align: right; }
+
+  /* Slider vertical (curso e zona morta) */
+  .travel { display: flex; gap: 14px; align-items: stretch; margin-top: 16px; }
+  .ruler { display: flex; flex-direction: column; justify-content: space-between; font-size: 10px; color: var(--muted); padding: 34px 0; text-align: right; font-variant-numeric: tabular-nums; }
+  .vcol { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .vslider { writing-mode: vertical-lr; height: 220px; width: 28px; accent-color: var(--accent); margin: 0; }
+  .vslider.up { direction: rtl; }
+  .bubble { align-self: center; background: var(--accent); color: #fff; border-radius: 4px; padding: 4px 8px; font-size: 12px; text-align: center; font-variant-numeric: tabular-nums; }
+  .bubble.red { background: var(--err); } .bubble.purple { background: var(--purple); }
+  .dz { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: center; }
+  .dz-row { display: flex; gap: 10px; align-items: center; justify-content: center; }
+
+  /* Iluminacao */
+  .light { display: grid; grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+  @media (max-width: 1100px) { .light { grid-template-columns: 1fr; } }
+  .light > section { padding: 20px; min-width: 0; }
+  .light > section + section { border-left: 1px solid var(--line); }
+  .modes { display: flex; flex-wrap: wrap; gap: 8px; }
+  .modes button { padding: 10px 14px; border-radius: 6px; border: 1px solid var(--line); background: var(--card); color: var(--text); box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+  .modes button.active { border-color: var(--key-sel); box-shadow: 0 0 0 1px var(--key-sel); }
+  .colorbox { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 14px; display: grid; gap: 12px; }
+  .colorbox input[type=color] { width: 100%; height: 110px; border: 0; padding: 0; background: none; cursor: pointer; }
+  .rgb { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .rgb label { display: grid; gap: 2px; font-size: 12px; color: var(--muted); }
+  .rgb input { width: 100%; font: inherit; padding: 4px 6px; border: 1px solid var(--line); border-radius: 4px; background: var(--card); color: var(--text); }
+  .swatches { display: flex; gap: 8px; flex-wrap: wrap; }
+  .swatches button { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--card); box-shadow: 0 0 0 1px var(--line); padding: 0; }
+  .cm { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; justify-self: start; }
+  .cm button { border: 0; padding: 7px 16px; background: var(--card); color: var(--text); }
+  .cm button.active { background: var(--accent); color: #fff; }
+
+  /* Dispositivo */
+  .device { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 420px)); gap: 10px; }
+  .dcol { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px; display: grid; gap: 12px; align-content: start; }
+  .dcard { background: var(--card); border: 1px solid var(--line); border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,.06); padding: 16px 18px; display: grid; grid-template-columns: 24px 1fr auto; gap: 14px; align-items: center; }
+  .dcard svg { width: 18px; height: 18px; }
+  .dcard select { font: inherit; padding: 5px 8px; border: 1px solid var(--line); border-radius: 4px; background: var(--card); color: var(--text); }
+
+  /* Tela inicial */
+  .welcome { display: grid; place-items: center; text-align: center; min-height: 60vh; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 24px; }
+  .welcome h1 { font-size: 22px; margin: 0 0 6px; }
+  .welcome p { color: var(--muted); max-width: 460px; margin: 0 auto 18px; }
+  .welcome .big { padding: 14px 28px; font-size: 15px; border-radius: 6px; border: 0; background: var(--accent); color: #fff; }
+  #status { font-size: 13px; }
+  #status.ok { color: #4cd685; } #status.err { color: #ff8a7f; }
+  pre#log { max-height: 220px; overflow: auto; font: 12px/1.4 ui-monospace, monospace; background: var(--panel); border: 1px solid var(--line); padding: 8px; border-radius: 8px; margin: 0; }
 </style>
 </head>
 <body>
-<main>
-  <h1>Configurador Aula HERO</h1>
-  <p class="sub">Configura o teclado direto pelo navegador (WebHID), sem o site oficial. Use Chrome ou Edge e o teclado <b>no cabo USB</b>.</p>
-
-  <div class="card">
-    <div class="row">
-      <button id="connect" class="primary">Conectar teclado</button>
+<div class="app">
+  <aside>
+    <div class="dev">
+      <div class="name" id="model">Nenhum teclado</div>
+      <div class="st" id="devst">desconectado</div>
+      <div class="st">Firmware: <span id="fw">-</span></div>
+    </div>
+    <h2 class="side-title">Perfis</h2>
+    <div class="profiles" id="profiles">
+      <button data-p="0" disabled>Perfil 1</button>
+      <button data-p="1" disabled>Perfil 2</button>
+      <button data-p="2" disabled>Perfil 3</button>
+    </div>
+    <div class="side-foot">
       <span id="status">Desconectado</span>
+      <button id="reload" disabled>Reler do teclado</button>
+      <button id="connect2">Conectar teclado</button>
+      <label><input type="checkbox" id="logon"> Mostrar log de pacotes</label>
     </div>
-    <div id="info" class="row hidden" style="margin-top:12px">
-      <span>Modelo: <b id="model">?</b></span>
-      <span>Firmware: <b id="fw">?</b></span>
-      <label class="field"><span>Perfil ativo</span>
-        <select id="profile"><option value="0">Perfil 1</option><option value="1">Perfil 2</option><option value="2">Perfil 3</option></select>
-      </label>
-      <button id="reload">Reler do teclado</button>
+  </aside>
+
+  <div class="main">
+    <nav class="tabs" id="tabs">
+      <button data-tab="button" disabled title="Ainda não suportado"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v12H3zm2 2v2h2V8zm3 0v2h2V8zm3 0v2h2V8zm3 0v2h2V8zm3 0v2h2V8zM5 11v2h2v-2zm3 0v2h2v-2zm3 0v2h2v-2zm3 0v2h2v-2zm3 0v2h2v-2zM7 14v2h10v-2z"/></svg>BOTÃO</button>
+      <button data-tab="light"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2zM9 19h6v1a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2z"/></svg>ILUMINAÇÃO</button>
+      <button data-tab="macro" disabled title="Ainda não suportado"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h12v4h4v12H8v-4H4zm2 2v8h2V8h6V6z"/></svg>MACRO</button>
+      <button data-tab="perf" class="active"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 12h3v8H5zm5.5-8h3v16h-3zM16 9h3v11h-3z"/></svg>DESEMPENHO</button>
+      <button data-tab="adv" disabled title="Ainda não suportado"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.7 18.6 13 9.9a5.5 5.5 0 0 0-7.1-7.1l3.6 3.6-3 3-3.6-3.6A5.5 5.5 0 0 0 10 12.9l8.7 8.7z"/></svg>TECLAS AVANÇADAS</button>
+      <button data-tab="device"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm9 5.5v-3l-2.4-.6a7 7 0 0 0-.7-1.7l1.3-2.1-2.1-2.1-2.1 1.3a7 7 0 0 0-1.7-.7L12.6 2h-3l-.6 2.4a7 7 0 0 0-1.7.7L5.2 3.8 3.1 5.9l1.3 2.1a7 7 0 0 0-.7 1.7L1.3 10.3v3l2.4.6c.2.6.4 1.2.7 1.7l-1.3 2.1 2.1 2.1 2.1-1.3c.5.3 1.100.5 1.7.7l.6 2.4h3l.6-2.4c.6-.2 1.2-.4 1.7-.7l2.1 1.3 2.1-2.1-1.3-2.1c.3-.5.5-1.1.7-1.7z"/></svg>DISPOSITIVO</button>
+    </nav>
+
+    <div id="welcome" class="welcome">
+      <div>
+        <h1>Conecte o teclado</h1>
+        <p>Ligue o Aula HERO no <b>cabo USB</b>, feche o site oficial e use Chrome ou Edge. O navegador vai pedir permissão para acessar o teclado.</p>
+        <button class="big" id="connect">CONECTAR TECLADO</button>
+      </div>
     </div>
+
+    <div id="ui" class="hidden">
+      <!-- Teclado desenhado (Iluminacao e Desempenho) -->
+      <div class="stage" id="stage">
+        <div class="stage-row">
+          <div class="kbwrap"><div id="kb"></div></div>
+          <div class="stage-side hidden" id="selbtns">
+            <button id="selall">Selecionar todas</button>
+            <button id="selwasd">WASD</button>
+            <button id="selnone">Limpar seleção</button>
+            <button id="selinv">Inverter seleção</button>
+          </div>
+        </div>
+        <div class="seg-wrap hidden" id="lightseg">
+          <div class="seg"><button data-l="keys" class="active">Luz das teclas</button><button data-l="side">Barra de luz</button></div>
+        </div>
+        <div class="seg-wrap" id="perfseg">
+          <div class="seg"><button data-m="global" class="active">Todas as teclas</button><button data-m="individual">Teclas individuais</button></div>
+          <div class="legend">Número na tecla: ponto de acionamento em mm · <span class="dot"></span>Rapid Trigger ligado</div>
+        </div>
+        <div class="banner hidden" id="banner">
+          <span class="info" id="liveinfo"></span>
+          <button class="btn blue" id="livestop">Parar</button>
+        </div>
+        <p class="warn hidden" id="caltips" style="text-align:center;margin:10px 0 0">Calibrando: aperte cada tecla devagar até o fundo e solte. Ela fica verde quando termina.
+          Só clique em <b>Terminar calibração</b> depois que todas estiverem verdes.</p>
+      </div>
+
+      <!-- Desempenho -->
+      <div class="panels" id="tab-perf">
+        <section>
+          <div class="ph"><div><h3>Ponto de acionamento</h3><p>Quanto a tecla precisa afundar para contar.</p></div></div>
+          <div class="note" id="target">Vale para todas as teclas</div>
+          <div class="row" style="margin-top:10px">
+            <button class="btn purple" id="calbtn">Calibrar teclas</button>
+            <button class="btn blue" id="livebtn">Curso ao vivo</button>
+          </div>
+          <div class="travel">
+            <div class="ruler"><span>0.00</span><span>0.50</span><span>1.00</span><span>1.50</span><span>2.00</span><span>2.50</span><span>3.00</span><span>3.50</span><span>4.00</span></div>
+            <div class="vcol">
+              <button class="pm" data-for="travel" data-d="-0.01">−</button>
+              <input type="range" class="vslider" id="travel" min="0" max="4" step="0.01">
+              <button class="pm" data-for="travel" data-d="0.01">+</button>
+            </div>
+            <div class="bubble">aciona em<br><b id="travel-v">-</b></div>
+          </div>
+          <p class="note" id="travelmax"></p>
+        </section>
+        <section>
+          <div class="ph"><div><h3>Rapid Trigger (RT)</h3><p>A tecla solta e aciona de novo assim que muda de direção.</p></div>
+            <label class="sw" title="Ligar ou desligar"><input type="checkbox" id="rt"><span></span></label></div>
+          <div id="rtbody">
+            <p class="note">Sensibilidade: quanto a tecla precisa se mover para acionar de novo (ao apertar) ou soltar (ao subir).</p>
+            <div>Sensibilidade ao apertar</div>
+            <div class="hs"><button class="pm" data-for="press" data-d="-0.01">−</button><input type="range" id="press" min="0.01" max="4" step="0.01"><button class="pm" data-for="press" data-d="0.01">+</button><span class="v" id="press-v"></span></div>
+            <div>Sensibilidade ao soltar</div>
+            <div class="hs"><button class="pm" data-for="release" data-d="-0.01">−</button><input type="range" id="release" min="0.01" max="4" step="0.01"><button class="pm" data-for="release" data-d="0.01">+</button><span class="v" id="release-v"></span></div>
+            <div class="row" style="justify-content:space-between;flex-wrap:nowrap">
+              <div><div>Ajustar apertar e soltar separados</div><div class="note">Desligado, soltar usa o mesmo valor de apertar.</div></div>
+              <label class="sw"><input type="checkbox" id="split"><span></span></label>
+            </div>
+          </div>
+        </section>
+        <section>
+          <div class="ph"><div><h3>Zona morta</h3><p>Em cima evita toque acidental; embaixo evita a tecla soltar sozinha no fundo.</p></div>
+            <label class="sw" title="Ligar ou desligar"><input type="checkbox" id="dzon"><span></span></label></div>
+          <div class="dz" id="dzbody">
+            <div class="vcol"><div>Em cima</div>
+              <button class="pm" data-for="dztop" data-d="-0.01">−</button>
+              <div class="dz-row"><input type="range" class="vslider" id="dztop" min="0" max="0.5" step="0.01" style="height:180px"><span class="bubble red" id="dztop-v"></span></div>
+              <button class="pm" data-for="dztop" data-d="0.01">+</button></div>
+            <div class="vcol"><div>Embaixo</div>
+              <button class="pm" data-for="dzbot" data-d="0.01">+</button>
+              <div class="dz-row"><input type="range" class="vslider up" id="dzbot" min="0" max="0.5" step="0.01" style="height:180px"><span class="bubble purple" id="dzbot-v"></span></div>
+              <button class="pm" data-for="dzbot" data-d="-0.01">−</button></div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Iluminacao -->
+      <div class="light hidden" id="tab-light">
+        <section><div class="modes" id="modes"></div></section>
+        <section>
+          <div class="colorbox">
+            <div class="cm" id="cmode"><button data-c="color" class="active">Cor única</button><button data-c="mix">Multicolorido</button></div>
+            <input type="color" id="lcolor" title="Escolher cor">
+            <div class="rgb"><label>R<input type="number" id="cr" min="0" max="255"></label><label>G<input type="number" id="cg" min="0" max="255"></label><label>B<input type="number" id="cb" min="0" max="255"></label></div>
+            <div class="swatches" id="swatches"></div>
+            <div>Velocidade</div>
+            <div class="hs"><button class="pm" data-for="lspeed" data-d="-1">−</button><input type="range" id="lspeed" min="0" max="4" step="1"><button class="pm" data-for="lspeed" data-d="1">+</button><span class="v" id="lspeed-v"></span></div>
+            <div>Brilho</div>
+            <div class="hs"><button class="pm" data-for="lbright" data-d="-1">−</button><input type="range" id="lbright" min="0" max="20" step="1"><button class="pm" data-for="lbright" data-d="1">+</button><span class="v" id="lbright-v"></span></div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Dispositivo -->
+      <div class="device hidden" id="tab-device">
+        <div class="dcol">
+          <div class="dcard"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M15 7v4h1v2h-3V5h2l-3-4-3 4h2v8H8v-2.1A2 2 0 1 0 6 11v2a2 2 0 0 0 2 2h3v3.3a2 2 0 1 0 2 0V15h3a2 2 0 0 0 2-2v-2h1V7z"/></svg><span>Conexão</span><b>Cabo USB</b></div>
+          <div class="dcard"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v12H3zm2 2v2h2V8zm4 0v2h2V8zm4 0v2h2V8zm4 0v2h2V8zM7 14v2h10v-2z"/></svg><span>Modelo</span><b id="model2">-</b></div>
+          <div class="dcard"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 3h6v2h3a1 1 0 0 1 1 1v3h2v6h-2v3a1 1 0 0 1-1 1h-3v2H9v-2H6a1 1 0 0 1-1-1v-3H3V9h2V6a1 1 0 0 1 1-1h3z"/></svg><span>Firmware</span><b id="fw2">-</b></div>
+        </div>
+        <div class="dcol">
+          <div class="dcard"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 2h2v10h-2zm6.6 3.4 1.4 1.4A8 8 0 1 1 5 6.8l1.4-1.4A6 6 0 1 0 17.6 5.4z"/></svg><span>Taxa de resposta</span><select id="polling"></select></div>
+          <div class="dcard"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5l8-1v8H3zm10-1.2L21 3v9h-8zM3 13h8v8l-8-1zm10 0h8v8l-8-1.2z"/></svg><span>Travar tecla Windows</span><label class="sw"><input type="checkbox" id="winlock"><span></span></label></div>
+          <div class="dcard"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 12.6c0-2.5 2-3.6 2.1-3.7a4.6 4.6 0 0 0-3.6-2c-1.5-.2-3 .9-3.7.9s-2-.9-3.2-.8A4.8 4.8 0 0 0 4 9.4c-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3 2.4 1.2 0 1.700-.8 3.100-.8s1.900.8 3.200.8 2.100-1.200 2.900-2.400a10 10 0 0 0 1.300-2.700 4.200 4.200 0 0 1-2.300-3.900zM14 5.2A4.3 4.3 0 0 0 15 2a4.4 4.4 0 0 0-2.900 1.500 4.100 4.100 0 0 0-1 3.100A3.600 3.600 0 0 0 14 5.200z"/></svg><span>Modo Mac</span><label class="sw"><input type="checkbox" id="mac"><span></span></label></div>
+          <div class="dcard"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg><span>Suspender após</span><select id="sleep"></select></div>
+        </div>
+      </div>
+    </div>
+
+    <pre id="log" class="hidden"></pre>
   </div>
-
-  <div id="panels" class="hidden">
-    <div class="card">
-      <h2>Iluminação</h2>
-      <div class="row">
-        <label class="field"><span>Efeito</span><select id="lmode"></select></label>
-        <label class="field"><span>Cor</span><input type="color" id="lcolor"></label>
-        <label><input type="checkbox" id="lrainbow"> Multicolorido</label>
-        <label class="field"><span>Brilho <span class="val" id="lbright-v"></span></span><input type="range" id="lbright" min="0" max="20"></label>
-        <label class="field"><span>Velocidade <span class="val" id="lspeed-v"></span></span><input type="range" id="lspeed" min="0" max="4"></label>
-        <button id="lapply" class="primary">Aplicar luz</button>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>Geral</h2>
-      <div class="row">
-        <label class="field"><span>Polling rate</span><select id="polling"></select></label>
-        <label class="field"><span>Suspender após</span><select id="sleep"></select></label>
-        <label><input type="checkbox" id="mac"> Modo Mac</label>
-        <label><input type="checkbox" id="winlock"> Travar tecla Windows</label>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>Acionamento e Rapid Trigger</h2>
-      <div class="row">
-        <button id="selall">Selecionar todas</button>
-        <button id="selnone">Limpar seleção</button>
-        <span id="selcount" style="color:var(--muted)"></span>
-      </div>
-      <div class="kbwrap"><div id="kb"></div></div>
-      <div class="row">
-        <label class="field"><span>Curso de acionamento <span class="val" id="travel-v"></span></span>
-          <input type="range" id="travel" min="0.1" max="4" step="0.01"></label>
-        <label><input type="checkbox" id="rt"> Rapid Trigger</label>
-        <label class="field rtf"><span>Sensibilidade ao apertar <span class="val" id="press-v"></span></span>
-          <input type="range" id="press" min="0.01" max="4" step="0.01"></label>
-        <label class="rtf"><input type="checkbox" id="split"> Soltar diferente</label>
-        <label class="field rtf" id="release-f"><span>Sensibilidade ao soltar <span class="val" id="release-v"></span></span>
-          <input type="range" id="release" min="0.01" max="4" step="0.01"></label>
-        <button id="kapply" class="primary">Aplicar nas teclas selecionadas</button>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>Log de pacotes</h2>
-      <label><input type="checkbox" id="logon"> Mostrar bytes enviados e recebidos</label>
-      <pre id="log" class="hidden"></pre>
-    </div>
-  </div>
-</main>
+</div>
 
 <script src="layouts.js"></script>
 <script src="protocol.js"></script>
 <script>
 const $ = (id) => document.getElementById(id);
-let kb = null, layout = [], selected = new Set(), keyTypes = {}, travel = {}, rtv = {};
+let kb = null, layout = [], keyTypes = {}, travel = {}, rtv = {}, dz = {};
+let tab = "perf", perfMode = "global", selected = new Set();
+let keyEls = {};                 // pos -> { el, fill, b, i, name, n }
+let liveMode = null;             // null | "live" | "cal"
+let liveTimer = null, calRange = {}, calDone = new Set(), recent = new Map();
 
+// ---------- Log e status ----------
 const logEl = $("log");
 function log(dir, text) {
   if (!$("logon").checked) return;
-  logEl.textContent += `${dir === "tx" ? "→" : "←"} ${text}\n`;
+  logEl.textContent += `${dir === "tx" ? "→" : dir === "rx" ? "←" : dir} ${text}\n`;
   logEl.scrollTop = logEl.scrollHeight;
 }
 $("logon").onchange = () => logEl.classList.toggle("hidden", !$("logon").checked);
-
 function status(text, kind = "") { const s = $("status"); s.textContent = text; s.className = kind; }
-
-function fill(sel, opts) { sel.innerHTML = opts.map(([v, t]) => `<option value="${v}">${t}</option>`).join(""); }
-fill($("lmode"), LIGHT_MODES); fill($("polling"), POLLING); fill($("sleep"), SLEEP);
-
-// Com "Multicolorido" ligado o teclado ignora a cor; escolher uma cor desliga essa opcao.
-$("lcolor").oninput = () => { $("lrainbow").checked = false; };
-for (const id of ["lbright", "lspeed"]) $(id).oninput = () => ($(id + "-v").textContent = $(id).value);
-const mm = (v) => `${Number(v).toFixed(2)} mm`;
-for (const id of ["travel", "press", "release"]) $(id).oninput = () => {
-  $(id + "-v").textContent = mm($(id).value);
-  if (id === "press" && !$("split").checked) { $("release").value = $("press").value; $("release-v").textContent = mm($("press").value); }
-};
-function syncRtVisibility() {
-  document.querySelectorAll(".rtf").forEach((e) => e.classList.toggle("hidden", !$("rt").checked));
-  $("release-f").classList.toggle("hidden", !$("rt").checked || !$("split").checked);
+async function guarded(label, fn) {
+  status(label + "...");
+  try { await fn(); status(label + ": ok", "ok"); } catch (e) { status(`${label}: ${e.message}`, "err"); }
 }
-$("rt").onchange = syncRtVisibility; $("split").onchange = () => { $("press").oninput(); syncRtVisibility(); };
+async function step(name, fn) {
+  try { return await fn(); } catch (e) { console.warn(name, e); log("!!", `${name}: ${e.message}`); return undefined; }
+}
+const mm = (v) => `${Number(v).toFixed(2)} mm`;
 
-// Teclas fora do desenho principal (variantes de layout) sobrepoem outras; desenhamos so a primeira.
+// ---------- Abas ----------
+function setTab(t) {
+  if (liveMode && t !== "perf") stopLiveMode();
+  tab = t;
+  document.querySelectorAll("#tabs button").forEach((b) => b.classList.toggle("active", b.dataset.tab === t));
+  $("tab-perf").classList.toggle("hidden", t !== "perf");
+  $("tab-light").classList.toggle("hidden", t !== "light");
+  $("tab-device").classList.toggle("hidden", t !== "device");
+  $("stage").classList.toggle("hidden", t === "device");
+  $("perfseg").classList.toggle("hidden", t !== "perf" || !!liveMode);
+  $("lightseg").classList.toggle("hidden", t !== "light");
+  $("selbtns").classList.toggle("hidden", !(t === "perf" && perfMode === "individual" && !liveMode));
+  drawKeyboard();
+}
+document.querySelectorAll("#tabs button").forEach((b) => (b.onclick = () => setTab(b.dataset.tab)));
+
+// ---------- Teclado desenhado ----------
+const keyName = (k) => k.n.replace(/^[LR]_/, "");
 function drawKeyboard() {
-  const kbEl = $("kb"); kbEl.innerHTML = "";
+  if (!layout.length || $("stage").classList.contains("hidden")) return;
+  const kbEl = $("kb"); kbEl.innerHTML = ""; keyEls = {};
   const drawn = [];
   const maxX = Math.max(...layout.map((k) => k.x + k.w)), maxY = Math.max(...layout.map((k) => k.y + k.h));
-  const avail = kbEl.parentElement.clientWidth - 8;
-  const scale = Math.min(1.6, Math.max(0.8, avail / maxX));
-  kbEl.style.width = `${maxX * scale + 4}px`; kbEl.style.height = `${maxY * scale + 4}px`;
+  const side = $("selbtns").classList.contains("hidden") ? 0 : 150;
+  const avail = $("stage").clientWidth - 40 - side;
+  const scale = Math.min(1.5, Math.max(0.7, avail / maxX));
+  kbEl.style.width = `${maxX * scale + 2}px`; kbEl.style.height = `${maxY * scale + 2}px`;
   for (const k of layout) {
+    // variantes de layout ficam sobrepostas; desenhamos so a primeira
     if (drawn.some((d) => Math.abs(d.x - k.x) < 5 && Math.abs(d.y - k.y) < 5)) continue;
     drawn.push(k);
     const el = document.createElement("div");
-    el.className = "key" + (selected.has(k.p) ? " sel" : "");
-    Object.assign(el.style, { left: `${k.x * scale}px`, top: `${k.y * scale}px`, width: `${k.w * scale}px`, height: `${k.h * scale}px` });
-    const t = travel[k.p], r = rtv[k.p];
-    el.innerHTML = `<b></b><i>${t ? t.mm.toFixed(2) : ""}${r && r.on ? " RT" : ""}</i>`;
-    el.querySelector("b").textContent = k.n.replace(/^[LR]_/, "");
-    el.title = `${k.n} (pos ${k.p})`;
-    el.onclick = () => { selected.has(k.p) ? selected.delete(k.p) : selected.add(k.p); drawKeyboard(); };
+    el.className = "key";
+    Object.assign(el.style, { left: `${k.x * scale}px`, top: `${k.y * scale}px`, width: `${k.w * scale - 2}px`, height: `${k.h * scale - 2}px` });
+    el.innerHTML = `<div class="fill"></div><b></b><i></i>`;
+    el.querySelector("b").textContent = keyName(k);
+    el.onclick = () => onKeyClick(k.p);
     kbEl.appendChild(el);
+    keyEls[k.p] = { el, fill: el.querySelector(".fill"), b: el.querySelector("b"), i: el.querySelector("i"), name: keyName(k), n: k.n };
   }
-  $("selcount").textContent = `${selected.size} de ${layout.length} teclas selecionadas`;
+  updateKeys();
 }
-$("selall").onclick = () => { layout.forEach((k) => selected.add(k.p)); drawKeyboard(); };
-$("selnone").onclick = () => { selected.clear(); drawKeyboard(); };
 
+function updateKeys() {
+  const pickable = tab === "perf" && perfMode === "individual" && !liveMode;
+  for (const [p, e] of Object.entries(keyEls)) {
+    const pos = Number(p), t = travel[pos], r = rtv[pos], d = dz[pos];
+    e.el.classList.toggle("click", pickable);
+    e.el.classList.toggle("sel", pickable && selected.has(pos));
+    e.el.classList.toggle("rt", tab === "perf" && !liveMode && !!(r && r.on));
+    if (liveMode) continue;
+    e.i.textContent = tab === "perf" && t ? t.mm.toFixed(2) : "";
+    e.el.title = tab === "perf"
+      ? `${e.n}\nAciona em: ${t ? mm(t.mm) : "?"}\nRapid Trigger: ${r && r.on ? `apertar ${mm(r.press)}, soltar ${mm(r.release)}` : "desligado"}`
+        + `\nZona morta: ${d && d.on ? `cima ${mm(d.top)}, baixo ${mm(d.bottom)}` : "desligada"}`
+      : e.n;
+  }
+}
+
+function onKeyClick(pos) {
+  if (!(tab === "perf" && perfMode === "individual") || liveMode) return;
+  selected.has(pos) ? selected.delete(pos) : selected.add(pos);
+  updateKeys(); fillPerfControls();
+}
+const allPos = () => layout.map((k) => k.p);
+const drawnPos = () => Object.keys(keyEls).map(Number);
+$("selall").onclick = () => { drawnPos().forEach((p) => selected.add(p)); updateKeys(); fillPerfControls(); };
+$("selnone").onclick = () => { selected.clear(); updateKeys(); fillPerfControls(); };
+$("selinv").onclick = () => { drawnPos().forEach((p) => (selected.has(p) ? selected.delete(p) : selected.add(p))); updateKeys(); fillPerfControls(); };
+$("selwasd").onclick = () => {
+  selected.clear();
+  for (const k of layout) if (["W", "A", "S", "D"].includes(k.n) && keyEls[k.p]) selected.add(k.p);
+  updateKeys(); fillPerfControls();
+};
+document.querySelectorAll("#perfseg .seg button").forEach((b) => (b.onclick = () => {
+  perfMode = b.dataset.m;
+  document.querySelectorAll("#perfseg .seg button").forEach((x) => x.classList.toggle("active", x === b));
+  setTab("perf"); fillPerfControls();
+}));
+let resizeT = null;
+window.addEventListener("resize", () => { clearTimeout(resizeT); resizeT = setTimeout(() => { if (!liveMode) drawKeyboard(); }, 150); });
+
+// ---------- Desempenho ----------
+const targets = () => (perfMode === "global" ? allPos() : [...selected]);
 function maxTravelFor(positions) {
   const vals = positions.map((p) => SWITCH_MAX[keyTypes[p]] ?? 3400);
   return (vals.length ? Math.min(...vals) : 3400) / 1000;
 }
-
-async function step(name, fn) {
-  try { return await fn(); } catch (e) { console.warn(name, e); log("!!", `${name}: ${e.message}`); return undefined; }
+function showVals() {
+  $("travel-v").textContent = mm($("travel").value);
+  for (const id of ["press", "release"]) $(id + "-v").textContent = mm($(id).value);
+  $("dztop-v").textContent = mm($("dztop").value); $("dzbot-v").textContent = mm($("dzbot").value);
+  $("rtbody").style.opacity = $("rt").checked ? 1 : 0.45;
+  $("release").disabled = !$("split").checked;
+  $("dzbody").style.opacity = $("dzon").checked ? 1 : 0.45;
+}
+// Mostra nos controles os valores da primeira tecla alvo (como o app oficial)
+function fillPerfControls() {
+  const tg = targets();
+  $("target").textContent = perfMode === "global" ? "Vale para todas as teclas"
+    : tg.length ? `Vale para ${tg.length} tecla(s) selecionada(s)` : "Clique nas teclas do desenho para escolher";
+  const max = maxTravelFor(tg.length ? tg : allPos());
+  $("travelmax").textContent = `Esse switch vai até ${max.toFixed(1)} mm; acima disso o valor é cortado. Mínimo 0.10 mm.`;
+  const first = tg.find((p) => travel[p]) ?? allPos().find((p) => travel[p]);
+  if (first === undefined) return showVals();
+  $("travel").value = travel[first].mm;
+  const r = rtv[first];
+  if (r) { $("rt").checked = r.on; $("press").value = r.press || 0.1; $("release").value = r.release || 0.1; $("split").checked = r.on && r.press !== r.release; }
+  const d = dz[first];
+  if (d) { $("dzon").checked = d.on; $("dztop").value = d.top; $("dzbot").value = d.bottom; }
+  showVals();
 }
 
+// Grava assim que o controle e solto. Uma gravacao por vez; o que mudar durante ela entra na proxima.
+let saving = null, dirty = new Set();
+function queueSave(what) {
+  dirty.add(what);
+  if (saving) return;
+  saving = (async () => {
+    while (dirty.size) {
+      const parts = [...dirty]; dirty.clear();
+      const pos = targets();
+      if (!pos.length) { status("Escolha ao menos uma tecla no desenho", "err"); break; }
+      await guarded(`Gravando em ${pos.length} tecla(s)`, async () => {
+        if (parts.includes("travel")) {
+          const t = Math.min(Math.max(0.1, Number($("travel").value)), maxTravelFor(pos));
+          await kb.setTravel(pos.map((p) => ({ pos: p, mm: t, global: travel[p]?.global })));
+          travel = { ...travel, ...(await kb.getTravel(pos)) };
+        }
+        if (parts.includes("rt")) {
+          const press = Number($("press").value), release = $("split").checked ? Number($("release").value) : press;
+          await kb.setRT(pos.map((p) => ({ pos: p, on: $("rt").checked, press, release, global: rtv[p]?.global })));
+          rtv = { ...rtv, ...(await kb.getRT(pos)) };
+        }
+        if (parts.includes("dz")) {
+          await kb.setDeadZone(pos.map((p) => ({ pos: p, on: $("dzon").checked, top: Number($("dztop").value), bottom: Number($("dzbot").value), global: dz[p]?.global })));
+          dz = { ...dz, ...(await kb.getDeadZone(pos)) };
+        }
+      });
+      updateKeys(); fillPerfControls();
+    }
+    saving = null;
+  })();
+}
+const groupOf = { travel: "travel", press: "rt", release: "rt", rt: "rt", split: "rt", dztop: "dz", dzbot: "dz", dzon: "dz" };
+for (const id of ["travel", "press", "release", "dztop", "dzbot"]) {
+  $(id).oninput = () => {
+    if (id === "travel" && Number($("travel").value) < 0.1) $("travel").value = 0.1;
+    if (id === "press" && !$("split").checked) $("release").value = $("press").value;
+    showVals();
+  };
+  $(id).onchange = () => queueSave(groupOf[id]);
+}
+for (const id of ["rt", "split", "dzon"]) $(id).onchange = () => {
+  if (id === "split" && !$("split").checked) $("release").value = $("press").value;
+  showVals(); queueSave(groupOf[id]);
+};
+// Botoes - e + de todos os paineis
+document.querySelectorAll(".pm").forEach((b) => (b.onclick = () => {
+  const inp = $(b.dataset.for);
+  if (inp.disabled) return;
+  const v = Math.min(Number(inp.max), Math.max(Number(inp.min), Number(inp.value) + Number(b.dataset.d)));
+  inp.value = Number(v.toFixed(2)); inp.oninput(); inp.onchange();
+}));
+
+// ---------- Curso ao vivo e calibracao ----------
+function keyMax(pos) { return (SWITCH_MAX[keyTypes[pos]] ?? 3400) / 1000; }
+function onLive(keys) {
+  const now = performance.now();
+  for (const k of keys) {
+    const e = keyEls[k.pos]; if (!e) continue;
+    e.fill.style.height = `${Math.min(1, k.mm / keyMax(k.pos)) * 100}%`;
+    e.el.classList.toggle("on", k.pressed);
+    e.i.textContent = k.mm > 0.005 ? k.mm.toFixed(2) : "";
+    if (k.mm > 0.005) {
+      recent.set(k.pos, now);
+      const t = travel[k.pos];
+      $("liveinfo").textContent = `${e.name}: ${k.mm.toFixed(2)} mm de ${keyMax(k.pos).toFixed(1)}`
+        + (t ? ` · aciona em ${t.mm.toFixed(2)} mm` : "") + (k.pressed ? " · ACIONOU" : "");
+    }
+  }
+}
+function onCalibrate(keys) {
+  for (const k of keys) {
+    const e = keyEls[k.pos], r = calRange[k.pos]; if (!e) continue;
+    if (r) {
+      if (k.cur < r.min) r.min = k.cur; // igual ao app oficial: o minimo acompanha a leitura
+      const span = Math.abs(r.max - r.min) || 1;
+      e.fill.style.height = `${(1 - Math.min(1, Math.abs(Math.max(k.cur, r.min) - r.min) / span)) * 100}%`;
+    }
+    if (k.finished && !calDone.has(k.pos)) { calDone.add(k.pos); e.el.classList.add("done"); e.fill.style.height = "0"; }
+  }
+  $("liveinfo").textContent = `${calDone.size} de ${Object.keys(keyEls).length} teclas calibradas`;
+}
+function enterMode(mode) {
+  liveMode = mode;
+  $("perfseg").classList.add("hidden"); $("selbtns").classList.add("hidden");
+  $("banner").classList.remove("hidden"); $("caltips").classList.toggle("hidden", mode !== "cal");
+  $("livestop").textContent = mode === "cal" ? "Terminar calibração" : "Parar";
+  $("calbtn").disabled = true; $("livebtn").disabled = true;
+  drawKeyboard();
+}
+async function stopLiveMode() {
+  clearInterval(liveTimer); liveTimer = null;
+  const mode = liveMode; liveMode = null;
+  if (kb) { kb.onLive = null; kb.onCalibrate = null; }
+  $("banner").classList.add("hidden"); $("caltips").classList.add("hidden");
+  $("calbtn").disabled = false; $("livebtn").disabled = false;
+  setTab(tab);
+  if (mode === "live") await kb.liveStop().catch((e) => log("!!", e.message));
+  if (mode === "cal") await kb.calibrationStop();
+}
+$("livebtn").onclick = () => guarded("Curso ao vivo", async () => {
+  recent.clear(); enterMode("live");
+  kb.onLive = onLive;
+  try { await kb.liveStart(); } catch (e) { await stopLiveMode(); throw e; }
+  $("liveinfo").textContent = "Aperte uma tecla...";
+  // A cada 100 ms diz ao teclado quais teclas acompanhar: as que mexeram nos ultimos 2 s.
+  liveTimer = setInterval(() => {
+    const now = performance.now();
+    for (const [p, t] of recent) if (now - t > 2000) recent.delete(p);
+    if (recent.size) kb.liveWatch([...recent.keys()]).catch(() => {});
+  }, 100);
+});
+$("calbtn").onclick = () => {
+  if (!confirm("A calibração regrava a leitura dos sensores. Depois de começar, aperte TODAS as teclas até o fundo antes de terminar. Continuar?")) return;
+  guarded("Iniciando calibração", async () => {
+    calDone.clear(); enterMode("cal");
+    try {
+      calRange = await kb.calibrationRange(Object.keys(keyEls).map(Number));
+      kb.onCalibrate = onCalibrate;
+      await kb.calibrationStart();
+    } catch (e) { await stopLiveMode(); throw e; }
+    $("liveinfo").textContent = `0 de ${Object.keys(keyEls).length} teclas calibradas`;
+    liveTimer = setInterval(() => kb.calibrationStart().catch(() => {}), 1000);
+  });
+};
+$("livestop").onclick = () => {
+  if (liveMode === "cal") {
+    const total = Object.keys(keyEls).length;
+    if (calDone.size < total && !confirm(`Só ${calDone.size} de ${total} teclas ficaram verdes. Terminar mesmo assim?`)) return;
+    return guarded("Terminando calibração", stopLiveMode);
+  }
+  return guarded("Saindo do curso ao vivo", stopLiveMode);
+};
+// Fechar a aba no meio de um modo: tenta tirar o teclado dele.
+window.addEventListener("beforeunload", () => {
+  if (!kb || !liveMode) return;
+  const p = liveMode === "live" ? [0x98, 2, 0, 1, 0, 0, 0] : [0x94, 4, 0, 1, 0, 0, 0];
+  kb.device.sendReport(REPORT_ID, new Uint8Array(kb.build(p)));
+});
+
+// ---------- Iluminacao (teclas e barra de luz) ----------
+// Cada alvo tem seus efeitos, faixas e estado proprios; o painel mostra o alvo escolhido.
+const SWATCHES = ["#00ff00", "#ff0000", "#ff7f00", "#ffff00", "#0000ff", "#ff00ff", "#ff0080", "#00ffff", "#ffffff"];
+const LIGHT = {
+  keys: { modes: LIGHT_MODES, brightMax: 20, get: () => kb.getLight(), set: (v) => kb.setLight(v), st: { mode: 1, rainbow: false, color: "#ffffff", bright: 10, speed: 2 } },
+  side: { modes: SIDE_MODES, brightMax: 4, get: () => kb.getSideLight(), set: (v) => kb.setSideLight(v), st: { mode: 3, rainbow: false, color: "#ffffff", bright: 2, speed: 2 } },
+};
+let lightTarget = "keys";
+const L = () => LIGHT[lightTarget];
+$("swatches").innerHTML = SWATCHES.map((c) => `<button style="background:${c}" data-c="${c}" title="${c}"></button>`).join("");
+const hex2 = (n) => Number(n).toString(16).padStart(2, "0");
+function setColor(hex) {
+  L().st.color = hex; $("lcolor").value = hex;
+  $("cr").value = parseInt(hex.slice(1, 3), 16); $("cg").value = parseInt(hex.slice(3, 5), 16); $("cb").value = parseInt(hex.slice(5, 7), 16);
+}
+function drawModes() {
+  $("modes").innerHTML = L().modes.map(([v, t]) => `<button data-v="${v}">${t}</button>`).join("");
+  document.querySelectorAll("#modes button").forEach((b) => (b.onclick = () => { L().st.mode = Number(b.dataset.v); showLight(); applyLight(); }));
+}
+function showLight() {
+  const st = L().st;
+  document.querySelectorAll("#lightseg button").forEach((b) => b.classList.toggle("active", b.dataset.l === lightTarget));
+  document.querySelectorAll("#modes button").forEach((b) => b.classList.toggle("active", Number(b.dataset.v) === st.mode));
+  document.querySelectorAll("#cmode button").forEach((b) => b.classList.toggle("active", (b.dataset.c === "mix") === st.rainbow));
+  $("lbright").max = L().brightMax;
+  $("lbright").value = st.bright; $("lspeed").value = st.speed;
+  $("lspeed-v").textContent = st.speed; $("lbright-v").textContent = `${st.bright} de ${L().brightMax}`;
+  $("lcolor").value = st.color;
+  $("cr").value = parseInt(st.color.slice(1, 3), 16); $("cg").value = parseInt(st.color.slice(3, 5), 16); $("cb").value = parseInt(st.color.slice(5, 7), 16);
+}
+function loadLightState(target, l) {
+  if (!l) return;
+  Object.assign(LIGHT[target].st, { mode: l.mode, rainbow: l.rainbow, color: "#" + [l.r, l.g, l.b].map(hex2).join(""), bright: l.bright, speed: l.speed });
+}
+let lightTimer = null;
+function applyLight() { // espera 150 ms para juntar mudancas rapidas (ex.: arrastar a cor)
+  clearTimeout(lightTimer);
+  const target = L(), st = { ...target.st };
+  lightTimer = setTimeout(() => guarded(lightTarget === "side" ? "Aplicando barra de luz" : "Aplicando luz", () => target.set({
+    mode: st.mode, rainbow: st.rainbow, r: parseInt(st.color.slice(1, 3), 16), g: parseInt(st.color.slice(3, 5), 16), b: parseInt(st.color.slice(5, 7), 16),
+    bright: st.bright, speed: st.speed })), 150);
+}
+document.querySelectorAll("#lightseg button").forEach((b) => (b.onclick = () => { lightTarget = b.dataset.l; drawModes(); showLight(); }));
+document.querySelectorAll("#cmode button").forEach((b) => (b.onclick = () => { L().st.rainbow = b.dataset.c === "mix"; showLight(); applyLight(); }));
+document.querySelectorAll("#swatches button").forEach((b) => (b.onclick = () => { setColor(b.dataset.c); L().st.rainbow = false; showLight(); applyLight(); }));
+// Com "Multicolorido" o teclado ignora a cor; escolher uma cor volta para "Cor unica".
+$("lcolor").oninput = () => { setColor($("lcolor").value); L().st.rainbow = false; showLight(); applyLight(); };
+for (const id of ["cr", "cg", "cb"]) $(id).onchange = () => {
+  const v = (x) => hex2(Math.min(255, Math.max(0, Number($(x).value) || 0)));
+  setColor("#" + v("cr") + v("cg") + v("cb")); L().st.rainbow = false; showLight(); applyLight();
+};
+for (const id of ["lspeed", "lbright"]) {
+  $(id).oninput = () => { L().st[id === "lspeed" ? "speed" : "bright"] = Number($(id).value); showLight(); };
+  $(id).onchange = applyLight;
+}
+drawModes();
+
+// ---------- Dispositivo ----------
+function fill(sel, opts) { sel.innerHTML = opts.map(([v, t]) => `<option value="${v}">${t}</option>`).join(""); }
+fill($("polling"), POLLING); fill($("sleep"), SLEEP);
+$("polling").onchange = () => guarded("Taxa de resposta", () => kb.setPolling(Number($("polling").value)));
+$("sleep").onchange = () => guarded("Suspensão", () => kb.setSleep(Number($("sleep").value)));
+$("mac").onchange = () => guarded("Modo Mac", () => kb.setMacMode($("mac").checked));
+$("winlock").onchange = () => guarded("Trava do Windows", () => kb.setWinLock($("winlock").checked));
+
+// ---------- Perfis ----------
+function showProfile(p) { document.querySelectorAll("#profiles button").forEach((b) => b.classList.toggle("active", Number(b.dataset.p) === p)); }
+document.querySelectorAll("#profiles button").forEach((b) => (b.onclick = () => guarded("Trocando perfil", async () => {
+  if (liveMode) await stopLiveMode();
+  await kb.setProfile(Number(b.dataset.p)); await loadAll();
+})));
+
+// ---------- Leitura e conexao ----------
 async function loadAll() {
   status("Lendo configurações...");
   const fw = await step("firmware", () => kb.firmware());
-  $("fw").textContent = fw === undefined ? "?" : "0x" + fw.toString(16);
+  $("fw").textContent = $("fw2").textContent = fw === undefined ? "?" : "0x" + fw.toString(16);
   await step("precisao", () => kb.loadPrecision());
-  const prof = await step("perfil", () => kb.getProfile()); if (prof !== undefined) $("profile").value = prof;
+  const prof = await step("perfil", () => kb.getProfile()); if (prof !== undefined) showProfile(prof);
 
-  const l = await step("luz", () => kb.getLight());
-  if (l) {
-    $("lmode").value = l.mode; $("lrainbow").checked = l.rainbow;
-    $("lcolor").value = "#" + [l.r, l.g, l.b].map((x) => x.toString(16).padStart(2, "0")).join("");
-    $("lbright").value = l.bright; $("lspeed").value = l.speed; $("lbright").oninput(); $("lspeed").oninput();
-  }
+  loadLightState("keys", await step("luz", () => kb.getLight()));
+  loadLightState("side", await step("barra de luz", () => kb.getSideLight()));
+  showLight();
   const pol = await step("polling", () => kb.getPolling()); if (pol !== undefined) $("polling").value = pol;
   const slp = await step("suspensao", () => kb.getSleep()); if (slp !== undefined) $("sleep").value = slp;
   const mac = await step("mac", () => kb.getMacMode()); if (mac !== undefined) $("mac").checked = mac;
   const wl = await step("winlock", () => kb.getWinLock()); if (wl !== undefined) $("winlock").checked = wl;
 
-  const positions = layout.map((k) => k.p);
+  const positions = allPos();
   keyTypes = (await step("tipos de switch", () => kb.getKeyTypes(positions))) || {};
   travel = (await step("curso", () => kb.getTravel(positions))) || {};
   rtv = (await step("rapid trigger", () => kb.getRT(positions))) || {};
-
-  // Preenche os controles com os valores da primeira tecla que tiver dados
-  const first = positions.find((p) => travel[p]);
-  if (first !== undefined) { $("travel").value = travel[first].mm; }
-  const r = rtv[first];
-  if (r) { $("rt").checked = r.on; $("press").value = r.press || 0.1; $("release").value = r.release || 0.1; $("split").checked = r.on && r.press !== r.release; }
-  $("travel").max = maxTravelFor(positions);
-  ["travel", "press", "release"].forEach((id) => $(id + "-v").textContent = mm($(id).value));
-  syncRtVisibility(); drawKeyboard();
+  dz = (await step("zona morta", () => kb.getDeadZone(positions))) || {};
+  setTab(tab); fillPerfControls();
   status("Pronto", "ok");
 }
 
-async function guarded(label, fn) {
-  status(label + "...");
-  try { await fn(); status(label + ": ok", "ok"); } catch (e) { status(`${label}: ${e.message}`, "err"); }
-}
-
-$("connect").onclick = async () => {
+async function connect() {
   if (!navigator.hid) { status("Este navegador não tem WebHID. Use Chrome ou Edge.", "err"); return; }
   try {
+    if (liveMode) await stopLiveMode();
     const dev = await AulaKeyboard.pick();
     kb = new AulaKeyboard(dev, log);
     const id = await kb.uuid();
     const [name, layoutName] = MODELS[id] || [`Desconhecido (${id})`, "ARM32_HID_68"];
-    $("model").textContent = name;
+    $("model").textContent = $("model2").textContent = name;
+    $("devst").textContent = "conectado"; $("devst").className = "st on";
     layout = LAYOUTS[layoutName] || [];
-    $("info").classList.remove("hidden"); $("panels").classList.remove("hidden");
-    $("connect").textContent = "Reconectar";
+    $("welcome").classList.add("hidden"); $("ui").classList.remove("hidden");
+    document.querySelectorAll("#profiles button").forEach((b) => (b.disabled = false));
+    $("reload").disabled = false; $("connect2").textContent = "Reconectar";
     await loadAll();
   } catch (e) { status(e.message, "err"); }
-};
+}
+$("connect").onclick = connect; $("connect2").onclick = connect;
 $("reload").onclick = () => loadAll();
-
-$("profile").onchange = () => guarded("Trocando perfil", async () => { await kb.setProfile(Number($("profile").value)); await loadAll(); });
-
-$("lapply").onclick = () => guarded("Aplicando luz", () => {
-  const c = $("lcolor").value;
-  return kb.setLight({ mode: Number($("lmode").value), rainbow: $("lrainbow").checked,
-    r: parseInt(c.slice(1, 3), 16), g: parseInt(c.slice(3, 5), 16), b: parseInt(c.slice(5, 7), 16),
-    bright: Number($("lbright").value), speed: Number($("lspeed").value) });
-});
-
-$("polling").onchange = () => guarded("Polling rate", () => kb.setPolling(Number($("polling").value)));
-$("sleep").onchange = () => guarded("Suspensão", () => kb.setSleep(Number($("sleep").value)));
-$("mac").onchange = () => guarded("Modo Mac", () => kb.setMacMode($("mac").checked));
-$("winlock").onchange = () => guarded("Trava do Windows", () => kb.setWinLock($("winlock").checked));
-
-$("kapply").onclick = () => guarded("Gravando teclas", async () => {
-  const pos = [...selected];
-  if (!pos.length) throw new Error("selecione ao menos uma tecla");
-  const t = Math.min(Number($("travel").value), maxTravelFor(pos));
-  const press = Number($("press").value);
-  const release = $("split").checked ? Number($("release").value) : press;
-  await kb.setTravel(pos.map((p) => ({ pos: p, mm: t, global: travel[p]?.global })));
-  await kb.setRT(pos.map((p) => ({ pos: p, on: $("rt").checked, press, release, global: rtv[p]?.global })));
-  travel = { ...travel, ...(await kb.getTravel(pos)) };
-  rtv = { ...rtv, ...(await kb.getRT(pos)) };
-  drawKeyboard();
-});
 </script>
 </body>
 </html>

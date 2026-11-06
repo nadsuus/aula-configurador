@@ -13,13 +13,23 @@ feito a partir da leitura do JavaScript público de hero.aulastar.com. Roda no n
 
 ## O que faz
 
-- Perfil ativo (1 a 3)
-- Iluminação: efeito, cor, multicolorido, brilho, velocidade
-- Polling rate, suspensão, modo Mac, trava da tecla Windows
-- Curso de acionamento e Rapid Trigger por tecla (clique nas teclas ou "Selecionar todas")
+A tela segue o mesmo desenho do site oficial: perfis na lateral, abas em cima, teclado no meio.
+
+- **Perfis**: troca entre os 3 perfis do teclado
+- **Iluminação**: efeito, cor, multicolorido, brilho e velocidade, tanto da luz das teclas quanto da
+  **barra de luz** lateral
+- **Desempenho**, para todas as teclas ou só as escolhidas (com atalhos Selecionar todas, WASD, Inverter):
+  - ponto de acionamento
+  - Rapid Trigger, com sensibilidade de apertar e soltar
+  - zona morta de cima e de baixo
+  - **curso ao vivo**: mostra quanto cada tecla afundou e quando ela aciona
+  - **calibração** das teclas, com cada tecla ficando verde quando termina
+- **Dispositivo**: taxa de resposta (polling), suspensão, modo Mac, trava da tecla Windows
 - Log dos bytes enviados e recebidos
 
-De propósito **não** mexe em firmware, reset de fábrica, calibração ou macros.
+As abas Botão, Macro e Teclas avançadas aparecem desativadas: esses comandos ainda não foram mapeados.
+
+De propósito **não** mexe em firmware, reset de fábrica ou macros.
 
 ## Arquivos
 
