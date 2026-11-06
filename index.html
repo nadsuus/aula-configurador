@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Configurador Aula HERO</title>
+<style>
+  :root {
+    --bg: #f6f6f4; --card: #ffffff; --text: #1d1d1b; --muted: #6b6b66; --line: #deded8;
+    --accent: #2d6cdf; --accent-text: #ffffff; --key: #ececE7; --key-sel: #2d6cdf; --ok: #1f8a4c; --err: #c0392b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #151514; --card: #1f1f1d; --text: #ededea; --muted: #9a9a93; --line: #34342f;
+      --accent: #5b8ff0; --key: #2c2c29; --key-sel: #5b8ff0; --ok: #4cc27f; --err: #ef6f61; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 system-ui, sans-serif; }
+  main { max-width: 1040px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  h2 { font-size: 16px; margin: 0 0 12px; }
+  .sub { color: var(--muted); margin: 0 0 20px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+  .row { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; }
+  label { display: flex; gap: 8px; align-items: center; }
+  .field { display: grid; gap: 4px; min-width: 180px; }
+  .field span { color: var(--muted); font-size: 13px; }
+  select, input[type=number] { font: inherit; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--card); color: var(--text); }
+  input[type=range] { width: 220px; accent-color: var(--accent); }
+  button { font: inherit; padding: 8px 14px; border-radius: 6px; border: 1px solid var(--line); background: var(--card); color: var(--text); cursor: pointer; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+  button:disabled { opacity: .5; cursor: default; }
+  #status { font-size: 14px; }
+  #status.ok { color: var(--ok); } #status.err { color: var(--err); }
+  .hidden { display: none !important; }
+  .kbwrap { overflow-x: auto; margin: 12px 0; }
+  #kb { position: relative; }
+  .key { position: absolute; border-radius: 5px; background: var(--key); border: 1px solid var(--line);
+    font-size: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer; user-select: none; overflow: hidden; text-align: center; line-height: 1.1; }
+  .key b { font-weight: 600; font-size: 10px; }
+  .key i { font-style: normal; color: var(--muted); font-size: 9px; }
+  .key.sel { background: var(--key-sel); color: var(--accent-text); border-color: var(--key-sel); }
+  .key.sel i { color: var(--accent-text); }
+  pre#log { max-height: 220px; overflow: auto; font: 12px/1.4 ui-monospace, monospace; background: var(--bg); padding: 8px; border-radius: 6px; margin: 8px 0 0; }
+  .val { font-variant-numeric: tabular-nums; min-width: 64px; display: inline-block; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Configurador Aula HERO</h1>
+  <p class="sub">Configura o teclado direto pelo navegador (WebHID), sem o site oficial. Use Chrome ou Edge e o teclado <b>no cabo USB</b>.</p>
+
+  <div class="card">
+    <div class="row">
+      <button id="connect" class="primary">Conectar teclado</button>
+      <span id="status">Desconectado</span>
+    </div>
+    <div id="info" class="row hidden" style="margin-top:12px">
+      <span>Modelo: <b id="model">?</b></span>
+      <span>Firmware: <b id="fw">?</b></span>
+      <label class="field"><span>Perfil ativo</span>
+        <select id="profile"><option value="0">Perfil 1</option><option value="1">Perfil 2</option><option value="2">Perfil 3</option></select>
+      </label>
+      <button id="reload">Reler do teclado</button>
+    </div>
+  </div>
+
+  <div id="panels" class="hidden">
+    <div class="card">
+      <h2>Iluminação</h2>
+      <div class="row">
+        <label class="field"><span>Efeito</span><select id="lmode"></select></label>
+        <label class="field"><span>Cor</span><input type="color" id="lcolor"></label>
+        <label><input type="checkbox" id="lrainbow"> Multicolorido</label>
+        <label class="field"><span>Brilho <span class="val" id="lbright-v"></span></span><input type="range" id="lbright" min="0" max="20"></label>
+        <label class="field"><span>Velocidade <span class="val" id="lspeed-v"></span></span><input type="range" id="lspeed" min="0" max="4"></label>
+        <button id="lapply" class="primary">Aplicar luz</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Geral</h2>
+      <div class="row">
+        <label class="field"><span>Polling rate</span><select id="polling"></select></label>
+        <label class="field"><span>Suspender após</span><select id="sleep"></select></label>
+        <label><input type="checkbox" id="mac"> Modo Mac</label>
+        <label><input type="checkbox" id="winlock"> Travar tecla Windows</label>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Acionamento e Rapid Trigger</h2>
+      <div class="row">
+        <button id="selall">Selecionar todas</button>
+        <button id="selnone">Limpar seleção</button>
+        <span id="selcount" style="color:var(--muted)"></span>
+      </div>
+      <div class="kbwrap"><div id="kb"></div></div>
+      <div class="row">
+        <label class="field"><span>Curso de acionamento <span class="val" id="travel-v"></span></span>
+          <input type="range" id="travel" min="0.1" max="4" step="0.01"></label>
+        <label><input type="checkbox" id="rt"> Rapid Trigger</label>
+        <label class="field rtf"><span>Sensibilidade ao apertar <span class="val" id="press-v"></span></span>
+          <input type="range" id="press" min="0.01" max="4" step="0.01"></label>
+        <label class="rtf"><input type="checkbox" id="split"> Soltar diferente</label>
+        <label class="field rtf" id="release-f"><span>Sensibilidade ao soltar <span class="val" id="release-v"></span></span>
+          <input type="range" id="release" min="0.01" max="4" step="0.01"></label>
+        <button id="kapply" class="primary">Aplicar nas teclas selecionadas</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Log de pacotes</h2>
+      <label><input type="checkbox" id="logon"> Mostrar bytes enviados e recebidos</label>
+      <pre id="log" class="hidden"></pre>
+    </div>
+  </div>
+</main>
+
+<script src="layouts.js"></script>
+<script src="protocol.js"></script>
+<script>
+const $ = (id) => document.getElementById(id);
+let kb = null, layout = [], selected = new Set(), keyTypes = {}, travel = {}, rtv = {};
+
+const logEl = $("log");
+function log(dir, text) {
+  if (!$("logon").checked) return;
+  logEl.textContent += `${dir === "tx" ? "→" : "←"} ${text}\n`;
+  logEl.scrollTop = logEl.scrollHeight;
+}
+$("logon").onchange = () => logEl.classList.toggle("hidden", !$("logon").checked);
+
+function status(text, kind = "") { const s = $("status"); s.textContent = text; s.className = kind; }
+
+function fill(sel, opts) { sel.innerHTML = opts.map(([v, t]) => `<option value="${v}">${t}</option>`).join(""); }
+fill($("lmode"), LIGHT_MODES); fill($("polling"), POLLING); fill($("sleep"), SLEEP);
+
+// Com "Multicolorido" ligado o teclado ignora a cor; escolher uma cor desliga essa opcao.
+$("lcolor").oninput = () => { $("lrainbow").checked = false; };
+for (const id of ["lbright", "lspeed"]) $(id).oninput = () => ($(id + "-v").textContent = $(id).value);
+const mm = (v) => `${Number(v).toFixed(2)} mm`;
+for (const id of ["travel", "press", "release"]) $(id).oninput = () => {
+  $(id + "-v").textContent = mm($(id).value);
+  if (id === "press" && !$("split").checked) { $("release").value = $("press").value; $("release-v").textContent = mm($("press").value); }
+};
+function syncRtVisibility() {
+  document.querySelectorAll(".rtf").forEach((e) => e.classList.toggle("hidden", !$("rt").checked));
+  $("release-f").classList.toggle("hidden", !$("rt").checked || !$("split").checked);
+}
+$("rt").onchange = syncRtVisibility; $("split").onchange = () => { $("press").oninput(); syncRtVisibility(); };
+
+// Teclas fora do desenho principal (variantes de layout) sobrepoem outras; desenhamos so a primeira.
+function drawKeyboard() {
+  const kbEl = $("kb"); kbEl.innerHTML = "";
+  const drawn = [];
+  const maxX = Math.max(...layout.map((k) => k.x + k.w)), maxY = Math.max(...layout.map((k) => k.y + k.h));
+  const avail = kbEl.parentElement.clientWidth - 8;
+  const scale = Math.min(1.6, Math.max(0.8, avail / maxX));
+  kbEl.style.width = `${maxX * scale + 4}px`; kbEl.style.height = `${maxY * scale + 4}px`;
+  for (const k of layout) {
+    if (drawn.some((d) => Math.abs(d.x - k.x) < 5 && Math.abs(d.y - k.y) < 5)) continue;
+    drawn.push(k);
+    const el = document.createElement("div");
+    el.className = "key" + (selected.has(k.p) ? " sel" : "");
+    Object.assign(el.style, { left: `${k.x * scale}px`, top: `${k.y * scale}px`, width: `${k.w * scale}px`, height: `${k.h * scale}px` });
+    const t = travel[k.p], r = rtv[k.p];
+    el.innerHTML = `<b></b><i>${t ? t.mm.toFixed(2) : ""}${r && r.on ? " RT" : ""}</i>`;
+    el.querySelector("b").textContent = k.n.replace(/^[LR]_/, "");
+    el.title = `${k.n} (pos ${k.p})`;
+    el.onclick = () => { selected.has(k.p) ? selected.delete(k.p) : selected.add(k.p); drawKeyboard(); };
+    kbEl.appendChild(el);
+  }
+  $("selcount").textContent = `${selected.size} de ${layout.length} teclas selecionadas`;
+}
+$("selall").onclick = () => { layout.forEach((k) => selected.add(k.p)); drawKeyboard(); };
+$("selnone").onclick = () => { selected.clear(); drawKeyboard(); };
+
+function maxTravelFor(positions) {
+  const vals = positions.map((p) => SWITCH_MAX[keyTypes[p]] ?? 3400);
+  return (vals.length ? Math.min(...vals) : 3400) / 1000;
+}
+
+async function step(name, fn) {
+  try { return await fn(); } catch (e) { console.warn(name, e); log("!!", `${name}: ${e.message}`); return undefined; }
+}
+
+async function loadAll() {
+  status("Lendo configurações...");
+  const fw = await step("firmware", () => kb.firmware());
+  $("fw").textContent = fw === undefined ? "?" : "0x" + fw.toString(16);
+  await step("precisao", () => kb.loadPrecision());
+  const prof = await step("perfil", () => kb.getProfile()); if (prof !== undefined) $("profile").value = prof;
+
+  const l = await step("luz", () => kb.getLight());
+  if (l) {
+    $("lmode").value = l.mode; $("lrainbow").checked = l.rainbow;
+    $("lcolor").value = "#" + [l.r, l.g, l.b].map((x) => x.toString(16).padStart(2, "0")).join("");
+    $("lbright").value = l.bright; $("lspeed").value = l.speed; $("lbright").oninput(); $("lspeed").oninput();
+  }
+  const pol = await step("polling", () => kb.getPolling()); if (pol !== undefined) $("polling").value = pol;
+  const slp = await step("suspensao", () => kb.getSleep()); if (slp !== undefined) $("sleep").value = slp;
+  const mac = await step("mac", () => kb.getMacMode()); if (mac !== undefined) $("mac").checked = mac;
+  const wl = await step("winlock", () => kb.getWinLock()); if (wl !== undefined) $("winlock").checked = wl;
+
+  const positions = layout.map((k) => k.p);
+  keyTypes = (await step("tipos de switch", () => kb.getKeyTypes(positions))) || {};
+  travel = (await step("curso", () => kb.getTravel(positions))) || {};
+  rtv = (await step("rapid trigger", () => kb.getRT(positions))) || {};
+
+  // Preenche os controles com os valores da primeira tecla que tiver dados
+  const first = positions.find((p) => travel[p]);
+  if (first !== undefined) { $("travel").value = travel[first].mm; }
+  const r = rtv[first];
+  if (r) { $("rt").checked = r.on; $("press").value = r.press || 0.1; $("release").value = r.release || 0.1; $("split").checked = r.on && r.press !== r.release; }
+  $("travel").max = maxTravelFor(positions);
+  ["travel", "press", "release"].forEach((id) => $(id + "-v").textContent = mm($(id).value));
+  syncRtVisibility(); drawKeyboard();
+  status("Pronto", "ok");
+}
+
+async function guarded(label, fn) {
+  status(label + "...");
+  try { await fn(); status(label + ": ok", "ok"); } catch (e) { status(`${label}: ${e.message}`, "err"); }
+}
+
+$("connect").onclick = async () => {
+  if (!navigator.hid) { status("Este navegador não tem WebHID. Use Chrome ou Edge.", "err"); return; }
+  try {
+    const dev = await AulaKeyboard.pick();
+    kb = new AulaKeyboard(dev, log);
+    const id = await kb.uuid();
+    const [name, layoutName] = MODELS[id] || [`Desconhecido (${id})`, "ARM32_HID_68"];
+    $("model").textContent = name;
+    layout = LAYOUTS[layoutName] || [];
+    $("info").classList.remove("hidden"); $("panels").classList.remove("hidden");
+    $("connect").textContent = "Reconectar";
+    await loadAll();
+  } catch (e) { status(e.message, "err"); }
+};
+$("reload").onclick = () => loadAll();
+
+$("profile").onchange = () => guarded("Trocando perfil", async () => { await kb.setProfile(Number($("profile").value)); await loadAll(); });
+
+$("lapply").onclick = () => guarded("Aplicando luz", () => {
+  const c = $("lcolor").value;
+  return kb.setLight({ mode: Number($("lmode").value), rainbow: $("lrainbow").checked,
+    r: parseInt(c.slice(1, 3), 16), g: parseInt(c.slice(3, 5), 16), b: parseInt(c.slice(5, 7), 16),
+    bright: Number($("lbright").value), speed: Number($("lspeed").value) });
+});
+
+$("polling").onchange = () => guarded("Polling rate", () => kb.setPolling(Number($("polling").value)));
+$("sleep").onchange = () => guarded("Suspensão", () => kb.setSleep(Number($("sleep").value)));
+$("mac").onchange = () => guarded("Modo Mac", () => kb.setMacMode($("mac").checked));
+$("winlock").onchange = () => guarded("Trava do Windows", () => kb.setWinLock($("winlock").checked));
+
+$("kapply").onclick = () => guarded("Gravando teclas", async () => {
+  const pos = [...selected];
+  if (!pos.length) throw new Error("selecione ao menos uma tecla");
+  const t = Math.min(Number($("travel").value), maxTravelFor(pos));
+  const press = Number($("press").value);
+  const release = $("split").checked ? Number($("release").value) : press;
+  await kb.setTravel(pos.map((p) => ({ pos: p, mm: t, global: travel[p]?.global })));
+  await kb.setRT(pos.map((p) => ({ pos: p, on: $("rt").checked, press, release, global: rtv[p]?.global })));
+  travel = { ...travel, ...(await kb.getTravel(pos)) };
+  rtv = { ...rtv, ...(await kb.getRT(pos)) };
+  drawKeyboard();
+});
+</script>
+</body>
+</html>

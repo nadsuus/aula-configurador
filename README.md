@@ -1,0 +1,28 @@
+# Configurador Aula HERO
+
+Configurador leve para os teclados Aula HERO (68 HE, 68 AIR, 68 MINI, 84 HE, 87 HE, 99, 100…),
+feito a partir da leitura do JavaScript público de hero.aulastar.com. Roda no navegador via WebHID.
+
+## Como usar
+
+1. Ligue o teclado **no cabo USB** (o receptor 2.4G usa outro transporte e não é suportado).
+2. Sirva a pasta: `python3 -m http.server 8765 --bind 127.0.0.1`
+3. Abra no **Chrome ou Edge do Windows**: http://localhost:8765
+4. Clique em **Conectar teclado** e escolha o Aula na lista.
+5. Feche o site oficial antes: duas páginas falando com o teclado ao mesmo tempo embaralham as respostas.
+
+## O que faz
+
+- Perfil ativo (1 a 3)
+- Iluminação: efeito, cor, multicolorido, brilho, velocidade
+- Polling rate, suspensão, modo Mac, trava da tecla Windows
+- Curso de acionamento e Rapid Trigger por tecla (clique nas teclas ou "Selecionar todas")
+- Log dos bytes enviados e recebidos
+
+De propósito **não** mexe em firmware, reset de fábrica, calibração ou macros.
+
+## Arquivos
+
+- `protocol.js`: o protocolo (formato do pacote, checksum e cada comando), comentado
+- `layouts.js`: posição das teclas de cada modelo, extraída do app oficial
+- `index.html`: a interface
