@@ -131,6 +131,41 @@
   .codes button.cur { border-color: var(--key-sel); box-shadow: 0 0 0 1px var(--key-sel); }
   .codes:has(+ .nopick) button, .codes.off button { opacity: .5; cursor: default; }
 
+  /* Macro */
+  .macro { display: grid; grid-template-columns: 260px 1fr; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; min-height: 520px; }
+  @media (max-width: 900px) { .macro { grid-template-columns: 1fr; } }
+  .macro > section { padding: 18px 20px; min-width: 0; }
+  .macro > section + section { border-left: 1px solid var(--line); }
+  .mlist { display: grid; gap: 6px; margin-top: 12px; }
+  .mlist button { text-align: left; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--line); background: var(--card); color: var(--text); }
+  .mlist button.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .mlist button small { color: var(--muted); display: block; }
+  .field { display: grid; gap: 4px; }
+  .field > span { color: var(--muted); font-size: 12px; }
+  input[type=text], input[type=number], select.in { font: inherit; padding: 6px 8px; border: 1px solid var(--line); border-radius: 4px; background: var(--card); color: var(--text); }
+  .steps { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; background: var(--card); max-height: 340px; overflow: auto; }
+  .steps table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  .steps td, .steps th { padding: 6px 10px; border-bottom: 1px solid var(--line); text-align: left; }
+  .steps th { color: var(--muted); font-weight: 500; font-size: 12px; position: sticky; top: 0; background: var(--card); }
+  .steps input { width: 90px; }
+  .steps .x { border: 0; background: none; color: var(--err); font-size: 16px; }
+  .down { color: var(--accent); } .up { color: var(--muted); }
+  .rec { background: var(--err) !important; border-color: var(--err) !important; color: #fff !important; }
+  .empty { color: var(--muted); padding: 24px; text-align: center; }
+
+  /* Teclas avancadas */
+  .advpanel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 18px 20px; }
+  .types { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+  .types button { padding: 10px 14px; border-radius: 6px; border: 1px solid var(--line); background: var(--card); color: var(--text); text-align: left; }
+  .types button small { display: block; color: var(--muted); font-size: 11px; max-width: 220px; }
+  .types button.active { border-color: var(--key-sel); box-shadow: 0 0 0 1px var(--key-sel); }
+  .adved { display: grid; gap: 12px; background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 14px; margin-bottom: 12px; }
+  .adved .grid4 { display: grid; grid-template-columns: 180px repeat(4, minmax(0, 1fr)); gap: 6px; align-items: center; }
+  .adved .grid4 > span { color: var(--muted); font-size: 12px; }
+  .key.adv { background: #efe6fd; border-color: var(--purple); }
+  .key.adv i { color: var(--purple); }
+  @media (prefers-color-scheme: dark) { .key.adv { background: #2d2440; } }
+
   /* Iluminacao */
   .light { display: grid; grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
   @media (max-width: 1100px) { .light { grid-template-columns: 1fr; } }
@@ -193,9 +228,9 @@
     <nav class="tabs" id="tabs">
       <button data-tab="button"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v12H3zm2 2v2h2V8zm3 0v2h2V8zm3 0v2h2V8zm3 0v2h2V8zm3 0v2h2V8zM5 11v2h2v-2zm3 0v2h2v-2zm3 0v2h2v-2zm3 0v2h2v-2zm3 0v2h2v-2zM7 14v2h10v-2z"/></svg>BOTÃO</button>
       <button data-tab="light"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2zM9 19h6v1a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2z"/></svg>ILUMINAÇÃO</button>
-      <button data-tab="macro" disabled title="Ainda não suportado"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h12v4h4v12H8v-4H4zm2 2v8h2V8h6V6z"/></svg>MACRO</button>
+      <button data-tab="macro"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h12v4h4v12H8v-4H4zm2 2v8h2V8h6V6z"/></svg>MACRO</button>
       <button data-tab="perf" class="active"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 12h3v8H5zm5.5-8h3v16h-3zM16 9h3v11h-3z"/></svg>DESEMPENHO</button>
-      <button data-tab="adv" disabled title="Ainda não suportado"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.7 18.6 13 9.9a5.5 5.5 0 0 0-7.1-7.1l3.6 3.6-3 3-3.6-3.6A5.5 5.5 0 0 0 10 12.9l8.7 8.7z"/></svg>TECLAS AVANÇADAS</button>
+      <button data-tab="adv"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.7 18.6 13 9.9a5.5 5.5 0 0 0-7.1-7.1l3.6 3.6-3 3-3.6-3.6A5.5 5.5 0 0 0 10 12.9l8.7 8.7z"/></svg>TECLAS AVANÇADAS</button>
       <button data-tab="device"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm9 5.5v-3l-2.4-.6a7 7 0 0 0-.7-1.7l1.3-2.1-2.1-2.1-2.1 1.3a7 7 0 0 0-1.7-.7L12.6 2h-3l-.6 2.4a7 7 0 0 0-1.7.7L5.2 3.8 3.1 5.9l1.3 2.1a7 7 0 0 0-.7 1.7L1.3 10.3v3l2.4.6c.2.6.4 1.2.7 1.7l-1.3 2.1 2.1 2.1 2.1-1.3c.5.3 1.100.5 1.7.7l.6 2.4h3l.6-2.4c.6-.2 1.2-.4 1.7-.7l2.1 1.3 2.1-2.1-1.3-2.1c.3-.5.5-1.1.7-1.7z"/></svg>DISPOSITIVO</button>
     </nav>
 
@@ -301,6 +336,20 @@
         <div class="codes off" id="codes"></div>
       </div>
 
+      <!-- Teclas avancadas -->
+      <div class="advpanel hidden" id="tab-adv">
+        <div class="row" style="justify-content:space-between">
+          <div id="advinfo">Clique numa tecla do desenho para dar uma função avançada a ela.</div>
+          <span class="note" id="advcount"></span>
+        </div>
+        <div class="types" id="advtypes"></div>
+        <div class="adved hidden" id="adved"></div>
+        <div class="row">
+          <button class="btn blue" id="advsave" disabled>Gravar no teclado</button>
+          <button class="btn" id="advdel" disabled>Remover função avançada</button>
+        </div>
+      </div>
+
       <!-- Iluminacao -->
       <div class="light hidden" id="tab-light">
         <section><div class="modes" id="modes"></div></section>
@@ -332,6 +381,22 @@
           <div class="dcard"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg><span>Suspender após</span><select id="sleep"></select></div>
         </div>
       </div>
+    </div>
+
+    <!-- Macro (fora do #ui do teclado desenhado, mas so aparece conectado) -->
+    <div class="macro hidden" id="tab-macro">
+      <section>
+        <div class="row" style="flex-wrap:nowrap">
+          <input type="text" id="mnewname" placeholder="Nome da nova macro" style="flex:1;min-width:0">
+          <button class="btn blue" id="mnew">Nova</button>
+        </div>
+        <div class="mlist" id="mlist"></div>
+        <p class="note" style="margin-top:14px">O teclado não devolve as macros, então a lista fica guardada neste computador. Para usar uma macro, vá na aba Botão → categoria Macros e escolha a tecla.</p>
+        <button class="btn" id="msend" style="width:100%">Enviar todas para o teclado</button>
+      </section>
+      <section id="meditor">
+        <div class="empty">Crie ou escolha uma macro à esquerda.</div>
+      </section>
     </div>
 
     <pre id="log" class="hidden"></pre>
@@ -376,6 +441,10 @@ function setTab(t) {
   $("tab-perf").classList.toggle("hidden", t !== "perf");
   $("tab-light").classList.toggle("hidden", t !== "light");
   $("tab-button").classList.toggle("hidden", t !== "button");
+  $("tab-adv").classList.toggle("hidden", t !== "adv");
+  $("tab-macro").classList.toggle("hidden", t !== "macro" || !kb);
+  if (t === "macro") $("ui").classList.add("hidden"); else if (kb) $("ui").classList.remove("hidden");
+  if (t === "macro") stopRecording();
   $("layerbox").classList.toggle("hidden", t !== "button");
   $("tab-device").classList.toggle("hidden", t !== "device");
   $("stage").classList.toggle("hidden", t === "device");
@@ -421,6 +490,8 @@ function updateKeys() {
     e.el.classList.toggle("sel", pickable && selected.has(pos));
     e.el.classList.toggle("rt", tab === "perf" && !liveMode && !!(r && r.on));
     if (tab === "button") { showKeyFunction(pos, e); continue; }
+    if (tab === "adv") { showAdvKey(pos, e); continue; }
+    e.el.classList.remove("adv");
     e.el.classList.remove("changed", "pick");
     if (liveMode) continue;
     e.i.textContent = tab === "perf" && t ? t.mm.toFixed(2) : "";
@@ -433,6 +504,7 @@ function updateKeys() {
 
 function onKeyClick(pos) {
   if (tab === "button") return pickKey(pos);
+  if (tab === "adv") return pickAdv(pos);
   if (!(tab === "perf" && perfMode === "individual") || liveMode) return;
   selected.has(pos) ? selected.delete(pos) : selected.add(pos);
   updateKeys(); fillPerfControls();
@@ -636,7 +708,7 @@ const byOrigName = new Map(KEYCODES[0].keys.map(([label, v, orig]) => [orig, v])
 const defaultCode = (pos) => byOrigName.get(keyEls[pos]?.n ?? layout.find((k) => k.p === pos)?.n);
 function describe(entry) {
   if (!entry) return "?";
-  if (entry.macro !== null) return `Macro ${entry.macro + 1}`;
+  if (entry.macro !== null) return `Macro: ${macros[entry.macro]?.name ?? "nº " + (entry.macro + 1)}`;
   if (entry.value === 0) return layer === 0 ? "Desativada" : "Nenhuma";
   if (entry.value === 0xffffffff) return "Desconhecida";
   return codeName.get(entry.value) ?? "0x" + entry.value.toString(16).padStart(8, "0");
@@ -655,15 +727,26 @@ function showKeyFunction(pos, e) {
   e.el.title = `${e.n}: ${describe(keymap[layer]?.[pos])}`;
 }
 function drawCats() {
-  $("cats").innerHTML = KEYCODES.map((c) => `<button data-c="${c.id}">${c.name}</button>`).join("");
+  $("cats").innerHTML = KEYCODES.map((c) => `<button data-c="${c.id}">${c.name}</button>`).join("") + `<button data-c="macros">Macros</button>`;
   document.querySelectorAll("#cats button").forEach((b) => (b.onclick = () => { cat = b.dataset.c; drawCodes(); }));
 }
 function drawCodes() {
   document.querySelectorAll("#cats button").forEach((b) => b.classList.toggle("active", b.dataset.c === cat));
   const cur = picked !== null ? keymap[layer]?.[picked]?.value : undefined;
+  $("codes").classList.toggle("off", picked === null);
+  if (cat === "macros") {
+    $("codes").innerHTML = macros.length
+      ? macros.map((m, i) => `<button data-i="${i}" class="${keymap[layer]?.[picked]?.macro === i ? "cur" : ""}"></button>`).join("")
+      : `<span class="note">Nenhuma macro ainda. Crie uma na aba Macro.</span>`;
+    document.querySelectorAll("#codes button").forEach((b) => {
+      const m = macros[Number(b.dataset.i)];
+      b.textContent = `${m.name} (${MACRO_MODES.find((x) => x[0] === m.mode)?.[1] ?? ""}${m.mode === 1 ? " " + m.count + "x" : ""})`;
+      b.onclick = () => assignMacro(Number(b.dataset.i));
+    });
+    return;
+  }
   const c = KEYCODES.find((x) => x.id === cat);
   $("codes").innerHTML = c.keys.map(([label, v]) => `<button data-v="${v}" class="${v === cur ? "cur" : ""}">${label}</button>`).join("");
-  $("codes").classList.toggle("off", picked === null);
   document.querySelectorAll("#codes button").forEach((b) => (b.onclick = () => assign(Number(b.dataset.v))));
 }
 function showPicked() {
@@ -688,6 +771,16 @@ function assign(value) {
     && !confirm("Esta é a tecla Fn. Trocando ela, você perde o acesso à camada Fn pelo teclado (dá para restaurar por aqui). Continuar?")) return;
   guarded(`Gravando ${keyEls[pos].n} = ${codeName.get(value) ?? value}`, () => writeKey(pos, value));
 }
+// Ligar uma macro a uma tecla: envia as macros antes (o teclado guarda pelo numero), depois o codigo.
+function assignMacro(i) {
+  if (picked === null) return;
+  const pos = picked, m = macros[i];
+  if (!m.steps.length) { status("Essa macro está vazia", "err"); return; }
+  guarded(`Gravando ${keyEls[pos].n} = macro ${m.name}`, async () => {
+    await kb.setMacros(macros); macrosSent = true; showMacroList();
+    await writeKey(pos, AulaKeyboard.macroKeyValue(i, m.mode, m.count));
+  });
+}
 $("keyreset").onclick = () => {
   const pos = picked, v = defaultCode(pos);
   if (pos === null || v === undefined) return;
@@ -705,6 +798,275 @@ $("layerreset").onclick = () => {
   guarded("Restaurando camada", async () => { await kb.resetLayer(layer); await loadLayer(layer); updateKeys(); showPicked(); });
 };
 drawCats(); drawCodes();
+
+// ---------- Macros ----------
+// macros = [{ name, mode, count, steps: [{ code, up, delay }] }], guardadas no navegador/app.
+const MACRO_MODES = [[1, "Repetir N vezes"], [2, "Enquanto segurar a tecla"], [4, "Modo repetir"]];
+const MAX_STEPS = 150;
+let macros = [], mSel = null, recording = false, recLast = 0, macrosSent = true;
+try { macros = JSON.parse(localStorage.getItem("aula-macros") || "[]"); } catch { macros = []; }
+function saveMacros() { try { localStorage.setItem("aula-macros", JSON.stringify(macros)); } catch {} macrosSent = false; showMacroList(); }
+function showMacroList() {
+  $("mlist").innerHTML = macros.map((m, i) => `<button data-i="${i}" class="${i === mSel ? "active" : ""}"><b></b><small>${m.steps.length} passos · ${MACRO_MODES.find((x) => x[0] === m.mode)?.[1]}</small></button>`).join("");
+  document.querySelectorAll("#mlist button").forEach((b) => {
+    b.querySelector("b").textContent = `${Number(b.dataset.i) + 1}. ${macros[Number(b.dataset.i)].name}`;
+    b.onclick = () => { stopRecording(); mSel = Number(b.dataset.i); showMacroList(); showMacroEditor(); };
+  });
+  $("msend").textContent = macrosSent ? "Enviar todas para o teclado" : "Enviar todas para o teclado (há mudanças)";
+}
+$("mnew").onclick = () => {
+  const name = $("mnewname").value.trim();
+  if (!name) { status("Dê um nome para a macro", "err"); return; }
+  if (macros.some((m) => m.name === name)) { status("Já existe uma macro com esse nome", "err"); return; }
+  macros.push({ name, mode: 1, count: 1, steps: [] }); mSel = macros.length - 1; $("mnewname").value = "";
+  saveMacros(); showMacroEditor();
+};
+$("msend").onclick = () => guarded("Enviando macros", async () => { await kb.setMacros(macros); macrosSent = true; showMacroList(); });
+const addKeyOptions = () => Object.keys(MACRO_KEYS).map((c) => `<option value="${c}">${macroKeyName(c)}</option>`).join("");
+function showMacroEditor() {
+  const m = macros[mSel];
+  if (!m) { $("meditor").innerHTML = `<div class="empty">Crie ou escolha uma macro à esquerda.</div>`; return; }
+  $("meditor").innerHTML = `
+    <div class="row">
+      <label class="field"><span>Nome</span><input type="text" id="mname"></label>
+      <label class="field"><span>Como roda na tecla</span><select class="in" id="mmode">${MACRO_MODES.map(([v, t]) => `<option value="${v}">${t}</option>`).join("")}</select></label>
+      <label class="field" id="mcountf"><span>Vezes</span><input type="number" id="mcount" min="1" max="255" style="width:80px"></label>
+      <button class="btn" id="mdel" style="margin-left:auto">Excluir macro</button>
+    </div>
+    <div class="row" style="margin-top:14px">
+      <button class="btn blue" id="mrec">Gravar teclas</button>
+      <span class="note" id="mrecinfo">Clique em Gravar e digite: cada tecla vira um passo "desce" e um "sobe", com o tempo real entre eles.</span>
+    </div>
+    <div class="steps"><table><thead><tr><th>#</th><th>Ação</th><th>Tecla</th><th>Esperar depois (ms)</th><th></th></tr></thead><tbody id="msteps"></tbody></table></div>
+    <div class="row">
+      <select class="in" id="maddkey">${addKeyOptions()}</select>
+      <select class="in" id="maddup"><option value="0">desce</option><option value="1">sobe</option></select>
+      <button class="btn" id="madd">Adicionar passo</button>
+      <span style="margin-left:auto"></span>
+      <input type="number" id="mall" min="0" value="20" style="width:80px"><button class="btn" id="mallb">Mesma espera em todos</button>
+      <button class="btn" id="mclear">Limpar passos</button>
+    </div>`;
+  $("mname").value = m.name; $("mmode").value = m.mode; $("mcount").value = m.count;
+  $("mcountf").classList.toggle("hidden", m.mode !== 1);
+  $("mname").onchange = () => {
+    const n = $("mname").value.trim();
+    if (!n || macros.some((x, i) => i !== mSel && x.name === n)) { $("mname").value = m.name; status("Nome vazio ou repetido", "err"); return; }
+    m.name = n; saveMacros();
+  };
+  $("mmode").onchange = () => { m.mode = Number($("mmode").value); $("mcountf").classList.toggle("hidden", m.mode !== 1); saveMacros(); };
+  $("mcount").onchange = () => { m.count = Math.max(1, Math.min(255, Number($("mcount").value) || 1)); $("mcount").value = m.count; saveMacros(); };
+  $("mdel").onclick = () => {
+    if (!confirm(`Excluir a macro "${m.name}"? As teclas ligadas às macros depois dela passam a apontar para a macro seguinte até você enviar e religar.`)) return;
+    stopRecording(); macros.splice(mSel, 1); mSel = null; saveMacros(); showMacroEditor();
+  };
+  $("mrec").onclick = () => (recording ? stopRecording() : startRecording());
+  $("madd").onclick = () => addStep({ code: $("maddkey").value, up: $("maddup").value === "1", delay: 20 });
+  $("mallb").onclick = () => { const d = Math.max(0, Number($("mall").value) || 0); m.steps.forEach((st) => (st.delay = d)); saveMacros(); drawSteps(); };
+  $("mclear").onclick = () => { if (m.steps.length && confirm("Apagar todos os passos?")) { m.steps = []; saveMacros(); drawSteps(); } };
+  drawSteps();
+}
+function drawSteps() {
+  const m = macros[mSel]; if (!m) return;
+  $("msteps").innerHTML = m.steps.length ? m.steps.map((st, i) => `<tr><td>${i + 1}</td><td class="${st.up ? "up" : "down"}">${st.up ? "↑ sobe" : "↓ desce"}</td><td>${macroKeyName(st.code)}</td>
+    <td><input type="number" min="0" max="1048575" value="${st.delay}" data-i="${i}"></td><td><button class="x" data-i="${i}" title="Apagar passo">×</button></td></tr>`).join("")
+    : `<tr><td colspan="5" class="empty">Sem passos. Grave ou adicione abaixo.</td></tr>`;
+  document.querySelectorAll("#msteps input").forEach((inp) => (inp.onchange = () => { m.steps[Number(inp.dataset.i)].delay = Math.max(0, Math.min(1048575, Number(inp.value) || 0)); saveMacros(); }));
+  document.querySelectorAll("#msteps .x").forEach((b) => (b.onclick = () => { m.steps.splice(Number(b.dataset.i), 1); saveMacros(); drawSteps(); }));
+  const box = $("msteps").closest(".steps"); box.scrollTop = box.scrollHeight;
+}
+function addStep(st) {
+  const m = macros[mSel]; if (!m) return false;
+  if (m.steps.length >= MAX_STEPS) { status(`Macro chegou no máximo de ${MAX_STEPS} passos`, "err"); stopRecording(); return false; }
+  m.steps.push(st); saveMacros(); drawSteps(); return true;
+}
+// Gravacao: cada tecla vira "desce"/"sobe"; a espera de um passo e o tempo ate o proximo.
+function onRecKey(e) {
+  if (!recording || e.repeat) return;
+  e.preventDefault(); e.stopPropagation();
+  if (!MACRO_KEYS[e.code]) return;
+  const m = macros[mSel], now = performance.now();
+  if (m.steps.length && recLast) m.steps[m.steps.length - 1].delay = Math.min(1048575, Math.round(now - recLast));
+  recLast = now;
+  addStep({ code: e.code, up: e.type === "keyup", delay: 20 });
+}
+function startRecording() {
+  recording = true; recLast = 0;
+  window.addEventListener("keydown", onRecKey, true); window.addEventListener("keyup", onRecKey, true);
+  $("mrec").textContent = "Parar gravação"; $("mrec").classList.add("rec");
+  $("mrecinfo").textContent = "Gravando... digite as teclas. As teclas não fazem nada no PC enquanto grava.";
+}
+function stopRecording() {
+  if (!recording) return;
+  recording = false;
+  window.removeEventListener("keydown", onRecKey, true); window.removeEventListener("keyup", onRecKey, true);
+  if ($("mrec")) { $("mrec").textContent = "Gravar teclas"; $("mrec").classList.remove("rec"); $("mrecinfo").textContent = "Gravação parada."; }
+}
+showMacroList();
+
+// ---------- Teclas avancadas ----------
+// adv[pos] = configuracao lida do teclado (camada normal). O teclado aceita ate 40 por perfil.
+const ADV_TYPES = {
+  DKS: ["DKS", "Até 4 ações em 4 pontos do curso (começo, fundo, subindo, solta)"],
+  MT: ["Segurar / tocar (MT)", "Um toque faz uma coisa, segurar faz outra"],
+  TGL: ["Liga-desliga (TGL)", "Um toque deixa a tecla presa; outro toque solta"],
+  SOCD: ["SOCD", "Duas teclas opostas: escolhe qual vale quando as duas estão apertadas"],
+  MPT: ["Profundidades (MPT)", "Até 3 funções em 3 profundidades diferentes"],
+  END: ["Ao soltar (END)", "Manda outra tecla quando você solta"],
+};
+const SOCD_MODES = [[1, "A última apertada vale"], [3, "Tecla 1 sempre vale"], [4, "Tecla 2 sempre vale"], [0, "Nenhuma vale (se anulam)"]];
+const DKS_STAGES = ["Começo do aperto", "No fundo", "Subindo do fundo", "Soltou totalmente"];
+// opcoes por etapa (valores da tela do app oficial) e a conversao para os bytes do teclado
+const DKS_OPTS = [
+  [[0, "—"], [1, "Toque"], [4, "Segura na etapa"], [8, "Segura até a etapa 2"], [12, "Segura até a etapa 3"]],
+  [[0, "—"], [1, "Toque"], [4, "Segura na etapa"], [8, "Segura até a etapa 3"]],
+  [[0, "—"], [1, "Toque"], [4, "Segura na etapa"]],
+  [[0, "—"], [1, "Toque"]],
+];
+function dksToRaw(s) {
+  const n = [0, 0, 0, 0];
+  if (s[3] === 1) n[3] = 10;
+  if (s[2] === 1) n[2] = 10; if (s[2] === 4) n[2] = 14;
+  if (s[1] === 1) n[1] = 10; if (s[1] === 4) n[1] = 14; if (s[1] === 8) { n[1] = 6; n[2] = 12; }
+  if (s[0] === 1) n[0] = 10; if (s[0] === 4) n[0] = 14; if (s[0] === 8) { n[0] = 6; n[1] = 12; } if (s[0] === 12) { n[0] = 6; n[1] = 4; n[2] = 12; }
+  return n;
+}
+function dksFromRaw(s) {
+  const n = [0, 0, 0, 0];
+  if (s[3] === 10) n[3] = 1;
+  if (s[2] === 10) n[2] = 1; if (s[2] === 14) n[2] = 4;
+  if (s[1] === 10) n[1] = 1; if (s[1] === 14) n[1] = 4; if (s[1] === 6 && s[2] === 12) n[1] = 8;
+  if (s[0] === 10) n[0] = 1; if (s[0] === 14) n[0] = 4; if (s[0] === 6 && s[1] === 12) n[0] = 8; if (s[0] === 6 && s[1] === 4 && s[2] === 12) n[0] = 12;
+  return n;
+}
+let adv = {}, advFeatures = new Set(Object.keys(ADV_TYPES)), advPicked = null, advDraft = null;
+async function loadAdvanced() {
+  const f = await step("tipos de tecla avançada", () => kb.getAdvancedFeatures());
+  if (f && f.size) advFeatures = f;
+  adv = {};
+  const list = (await step("teclas avançadas", () => kb.getAdvancedPositions(0))) || [];
+  for (const p of list) { const a = await step(`tecla avançada ${p}`, () => kb.getAdvancedKey(0, p)); if (a) adv[p] = a; }
+}
+const keyNameOf = (pos) => layout.find((k) => k.p === pos)?.n ?? `pos ${pos}`;
+function showAdvKey(pos, e) {
+  const a = adv[pos];
+  e.el.classList.add("click");
+  e.el.classList.toggle("adv", !!a);
+  e.el.classList.toggle("pick", advPicked === pos);
+  e.el.classList.remove("changed");
+  e.i.textContent = a ? a.type : "";
+  e.el.title = a ? `${e.n}: ${ADV_TYPES[a.type]?.[0] ?? a.type}` : e.n;
+}
+function keySelect(id, value) {
+  const opts = KEYCODES.map((c) => `<optgroup label="${c.name}">${c.keys.map(([l, v]) => `<option value="${v}">${l}</option>`).join("")}</optgroup>`).join("");
+  return `<select class="in" id="${id}"><option value="0">— nenhuma —</option>${opts}</select>`;
+}
+function pickAdv(pos) {
+  advPicked = advPicked === pos ? null : pos;
+  const a = advPicked !== null ? adv[advPicked] : null;
+  advDraft = a ? JSON.parse(JSON.stringify(a)) : null;
+  updateKeys(); showAdvPanel();
+}
+function newDraft(type, pos) {
+  const base = defaultCode(pos) ?? 0;
+  return {
+    DKS: { type, depths: [1, 3, 3, 1], keys: [{ value: base, sets: [1, 0, 0, 0] }, { value: 0, sets: [0, 0, 0, 0] }, { value: 0, sets: [0, 0, 0, 0] }, { value: 0, sets: [0, 0, 0, 0] }], ui: true },
+    MT: { type, hold: 0x00010000, tap: base, delay: 200 },
+    TGL: { type, key: base, delay: 200 },
+    SOCD: { type, keys: [pos, pos], mode: 1 },
+    MPT: { type, keys: [{ value: base, depth: 0.5 }, { value: 0, depth: 1 }, { value: 0, depth: 1.5 }] },
+    END: { type, key: base },
+  }[type];
+}
+function showAdvPanel() {
+  const n = Object.keys(adv).length;
+  $("advcount").textContent = `${n} de 40 em uso`;
+  const pos = advPicked;
+  $("advinfo").innerHTML = pos === null ? "Clique numa tecla do desenho para dar uma função avançada a ela."
+    : `Tecla <b></b>: ${adv[pos] ? "tem " + ADV_TYPES[adv[pos].type]?.[0] : "sem função avançada"}. Escolha o tipo e ajuste abaixo.`;
+  if (pos !== null) $("advinfo").querySelector("b").textContent = keyNameOf(pos);
+  $("advtypes").innerHTML = pos === null ? "" : Object.entries(ADV_TYPES).filter(([t]) => advFeatures.has(t))
+    .map(([t, [name, desc]]) => `<button data-t="${t}" class="${advDraft?.type === t ? "active" : ""}">${name}<small>${desc}</small></button>`).join("");
+  document.querySelectorAll("#advtypes button").forEach((b) => (b.onclick = () => {
+    advDraft = adv[pos]?.type === b.dataset.t ? JSON.parse(JSON.stringify(adv[pos])) : newDraft(b.dataset.t, pos);
+    showAdvPanel();
+  }));
+  $("advsave").disabled = pos === null || !advDraft;
+  $("advdel").disabled = pos === null || !adv[pos];
+  drawAdvEditor();
+}
+function drawAdvEditor() {
+  const d = advDraft, ed = $("adved");
+  ed.classList.toggle("hidden", !d);
+  if (!d) { ed.innerHTML = ""; return; }
+  if (d.type === "DKS") {
+    if (!d.ui) { d.keys = d.keys.map((k) => ({ value: k.value, sets: dksFromRaw(k.sets) })); d.ui = true; }
+    ed.innerHTML = `<div class="grid4"><span>Ponto do curso (mm)</span>${d.depths.map((v, i) => `<label class="field"><span>${i + 1}. ${DKS_STAGES[i]}</span><input type="number" step="0.01" min="0.1" max="4" value="${v.toFixed(2)}" data-dep="${i}"></label>`).join("")}</div>
+      ${d.keys.map((k, r) => `<div class="grid4">${keySelect("dk" + r, k.value)}${DKS_OPTS.map((opts, c) => `<select class="in" data-r="${r}" data-c="${c}">${opts.map(([v, t]) => `<option value="${v}">${t}</option>`).join("")}</select>`).join("")}</div>`).join("")}
+      <p class="note">"Toque" aperta e solta na hora; "Segura" mantém a tecla apertada enquanto o curso estiver naquela parte.</p>`;
+    d.keys.forEach((k, r) => { $("dk" + r).value = k.value; $("dk" + r).onchange = () => (k.value = Number($("dk" + r).value)); });
+    ed.querySelectorAll("select[data-r]").forEach((s) => { const k = d.keys[s.dataset.r]; s.value = k.sets[s.dataset.c]; s.onchange = () => (k.sets[s.dataset.c] = Number(s.value)); });
+    ed.querySelectorAll("input[data-dep]").forEach((inp) => (inp.onchange = () => (d.depths[inp.dataset.dep] = Math.max(0.1, Math.min(4, Number(inp.value) || 0.1)))));
+  } else if (d.type === "MT") {
+    ed.innerHTML = `<div class="row"><label class="field"><span>Ao segurar</span>${keySelect("mth")}</label><label class="field"><span>Ao tocar</span>${keySelect("mtt")}</label>
+      <label class="field"><span>Segurar a partir de (ms)</span><input type="number" id="mtd" min="50" max="2000"></label></div>`;
+    $("mth").value = d.hold; $("mtt").value = d.tap; $("mtd").value = d.delay;
+    $("mth").onchange = () => (d.hold = Number($("mth").value)); $("mtt").onchange = () => (d.tap = Number($("mtt").value));
+    $("mtd").onchange = () => (d.delay = Math.max(1, Math.min(65535, Number($("mtd").value) || 200)));
+  } else if (d.type === "TGL") {
+    ed.innerHTML = `<div class="row"><label class="field"><span>Tecla</span>${keySelect("tgk")}</label><label class="field"><span>Toque curto até (ms)</span><input type="number" id="tgd" min="50" max="2000"></label></div>
+      <p class="note">Toque curto prende/solta a tecla; segurando mais que esse tempo ela funciona normal.</p>`;
+    $("tgk").value = d.key; $("tgd").value = d.delay;
+    $("tgk").onchange = () => (d.key = Number($("tgk").value)); $("tgd").onchange = () => (d.delay = Math.max(1, Math.min(65535, Number($("tgd").value) || 200)));
+  } else if (d.type === "END") {
+    ed.innerHTML = `<div class="row"><label class="field"><span>Mandar ao soltar</span>${keySelect("enk")}</label></div>`;
+    $("enk").value = d.key; $("enk").onchange = () => (d.key = Number($("enk").value));
+  } else if (d.type === "MPT") {
+    ed.innerHTML = d.keys.map((k, i) => `<div class="row"><label class="field"><span>Função ${i + 1}</span>${keySelect("mpk" + i)}</label>
+      <label class="field"><span>Na profundidade (mm)</span><input type="number" step="0.01" min="0.1" max="4" id="mpd${i}"></label></div>`).join("");
+    d.keys.forEach((k, i) => {
+      $("mpk" + i).value = k.value; $("mpd" + i).value = k.depth.toFixed(2);
+      $("mpk" + i).onchange = () => (k.value = Number($("mpk" + i).value));
+      $("mpd" + i).onchange = () => (k.depth = Math.max(0.1, Math.min(4, Number($("mpd" + i).value) || 0.1)));
+    });
+  } else if (d.type === "SOCD") {
+    const keyOpts = layout.filter((k, i, a) => a.findIndex((x) => x.p === k.p) === i).map((k) => `<option value="${k.p}">${k.n}</option>`).join("");
+    ed.innerHTML = `<div class="row"><label class="field"><span>Tecla 1</span><select class="in" id="sc1">${keyOpts}</select></label>
+      <label class="field"><span>Tecla 2</span><select class="in" id="sc2">${keyOpts}</select></label>
+      <label class="field"><span>Quando as duas estão apertadas</span><select class="in" id="scm">${SOCD_MODES.map(([v, t]) => `<option value="${v}">${t}</option>`).join("")}</select></label></div>
+      <p class="note">Exemplo: A e D num jogo. Com "a última apertada vale", segurar A e apertar D faz andar para a direita.</p>`;
+    $("sc1").value = d.keys[0]; $("sc2").value = d.keys[1] ?? d.keys[0]; $("scm").value = d.mode;
+    $("sc1").onchange = () => (d.keys[0] = Number($("sc1").value)); $("sc2").onchange = () => (d.keys[1] = Number($("sc2").value));
+    $("scm").onchange = () => (d.mode = Number($("scm").value));
+  }
+}
+async function reloadAdv(positions) {
+  const list = await kb.getAdvancedPositions(0);
+  for (const p of positions) delete adv[p];
+  for (const p of list) if (positions.includes(p) || !adv[p]) { const a = await kb.getAdvancedKey(0, p); if (a) adv[p] = a; else delete adv[p]; }
+  for (const p of Object.keys(adv)) if (!list.includes(Number(p))) delete adv[p];
+}
+$("advsave").onclick = () => {
+  const pos = advPicked, d = advDraft; if (pos === null || !d) return;
+  if (!adv[pos] && Object.keys(adv).length >= 40) { status("O teclado aceita no máximo 40 teclas avançadas por perfil", "err"); return; }
+  if (d.type === "SOCD" && d.keys[0] === d.keys[1]) { status("Escolha duas teclas diferentes para o SOCD", "err"); return; }
+  const out = d.type === "DKS" ? { ...d, keys: d.keys.map((k) => ({ value: k.value, sets: dksToRaw(k.sets) })) } : d;
+  guarded(`Gravando ${ADV_TYPES[d.type][0]} em ${keyNameOf(pos)}`, async () => {
+    const old = adv[pos];
+    if (old?.type === "SOCD") for (const p of old.keys) await kb.deleteAdvancedKey(0, p);
+    await kb.setAdvancedKey(0, pos, out);
+    await reloadAdv(d.type === "SOCD" ? [pos, ...d.keys] : [pos]);
+    advDraft = adv[pos] ? JSON.parse(JSON.stringify(adv[pos])) : advDraft;
+    updateKeys(); showAdvPanel();
+  });
+};
+$("advdel").onclick = () => {
+  const pos = advPicked, a = adv[pos]; if (pos === null || !a) return;
+  guarded(`Removendo função avançada de ${keyNameOf(pos)}`, async () => {
+    const ps = a.type === "SOCD" ? a.keys : [pos];
+    for (const p of ps) await kb.deleteAdvancedKey(0, p);
+    await reloadAdv(ps); advDraft = null; updateKeys(); showAdvPanel();
+  });
+};
 
 // ---------- Iluminacao (teclas e barra de luz) ----------
 // Cada alvo tem seus efeitos, faixas e estado proprios; o painel mostra o alvo escolhido.
@@ -800,6 +1162,7 @@ async function loadAll() {
   rtv = (await step("rapid trigger", () => kb.getRT(positions))) || {};
   dz = (await step("zona morta", () => kb.getDeadZone(positions))) || {};
   keymap = {}; await loadLayer(layer); picked = null; showPicked();
+  await loadAdvanced(); advPicked = null; showAdvPanel();
   setTab(tab); fillPerfControls();
   status("Pronto", "ok");
 }

@@ -38,6 +38,11 @@ A tela segue o mesmo desenho do site oficial: perfis na lateral, abas em cima, t
 - **Perfis**: troca entre os 3 perfis do teclado
 - **Botão**: troca a função de cada tecla nas camadas normal, Fn e Fn1 (teclas, mouse, atalhos,
   multimídia), volta uma tecla ou a camada inteira ao padrão
+- **Macro**: grava teclas com o tempo real entre elas, edita passos e esperas (até 150 passos),
+  escolhe como roda (N vezes, enquanto segurar, repetir) e liga numa tecla pela aba Botão.
+  O teclado não devolve as macros: a lista fica guardada no computador
+- **Teclas avançadas**: DKS, segurar/tocar (MT), liga-desliga (TGL), SOCD, profundidades (MPT)
+  e ao soltar (END), conforme o teclado aceitar; até 40 por perfil
 - **Iluminação**: efeito, cor, multicolorido, brilho e velocidade, tanto da luz das teclas quanto da
   **barra de luz** lateral
 - **Desempenho**, para todas as teclas ou só as escolhidas (com atalhos Selecionar todas, WASD, Inverter):
@@ -49,7 +54,6 @@ A tela segue o mesmo desenho do site oficial: perfis na lateral, abas em cima, t
 - **Dispositivo**: taxa de resposta (polling), suspensão, modo Mac, trava da tecla Windows
 - Log dos bytes enviados e recebidos
 
-As abas Macro e Teclas avançadas aparecem desativadas: esses comandos ainda não foram mapeados.
 De propósito **não** mexe em firmware nem em reset de fábrica.
 
 ## Arquivos

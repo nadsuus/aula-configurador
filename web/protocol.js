@@ -266,6 +266,94 @@ class AulaKeyboard {
     await this.transact(this.build([0x11, layer, 0, 1, 0, 1, 1]), 0x11, { timeout: 1500, tries: 3 });
   }
 
+  // ---------- Macros ----------
+  // O teclado so RECEBE macros: a lista fica guardada no computador (o app oficial faz igual).
+  // Cada envio substitui todas as macros do teclado. Formato do bloco:
+  //   tabela: para cada macro, inicio (LE16) e tamanho (LE16)
+  //   depois, cada macro: [tamanho do nome, nome em UTF-8..., passos de 4 bytes...]
+  //   passo: [tipo|espera>>16, espera>>8, espera, codigo]; tipo 0x00/0x80 tecla desce/sobe,
+  //   0x10/0x90 modificador, 0x20/0xA0 botao do mouse (ver MACRO_KEYS em keycodes.js)
+  // Vai em pacotes de 56 bytes com o comando 0x05 ([3] = total de pacotes, [4] = indice).
+  static macroBlob(macros) {
+    const entries = macros.map((m) => {
+      const name = Array.from(new TextEncoder().encode(m.name)).slice(0, 255);
+      const steps = m.steps.flatMap(({ code, up, delay }) => {
+        const k = MACRO_KEYS[code]; if (!k) return [];
+        const kind = [0x00, 0x10, 0x20][k[1]] | (up ? 0x80 : 0);
+        const d = Math.max(0, Math.min(0xfffff, Math.round(delay || 0)));
+        return [kind | ((d >> 16) & 0x0f), (d >> 8) & 0xff, d & 0xff, k[0]];
+      });
+      return [name.length, ...name, ...steps];
+    });
+    const table = []; let off = entries.length * 4;
+    for (const e of entries) { table.push(off & 0xff, (off >> 8) & 0xff, e.length & 0xff, (e.length >> 8) & 0xff); off += e.length; }
+    return [...table, ...entries.flat()];
+  }
+  async setMacros(macros) {
+    const parts = chunk(AulaKeyboard.macroBlob(macros), 56);
+    for (let i = 0; i < parts.length; i++) {
+      await this.transact(this.build([0x05, 0, 0, parts.length, i, parts[i].length], parts[i]), 0x05, { timeout: 1000 });
+    }
+  }
+  // Codigo de tecla para "esta tecla roda a macro idx". modo: 1 = repetir N vezes,
+  // 2 = enquanto segurar a tecla, 4 = modo "repetir" do app oficial
+  static macroKeyValue(idx, mode, count) { return ((3 << 24) | (mode << 16) | ((count & 0xff) << 8) | (idx & 0xff)) >>> 0; }
+
+  // ---------- Teclas avancadas (DKS, MT, TGL, SOCD, MPT, END) ----------
+  // Ler: 0x92 (todas as posicoes com tecla avancada, ou uma posicao). Gravar: 0x12, [2] = tipo.
+  // Profundidades em unidades de precisao (centesimos de mm com precisao 10).
+  // Quais tipos este teclado aceita: 0x82 sub 4, bits 0..5 = TGL, MT, DKS, SOCD, MPT, END
+  async getAdvancedFeatures() {
+    const d = this.data(await this.transact(this.build([0x82, 4, 0, 1, 0, 0, 0]), 0x82));
+    const names = ["TGL", "MT", "DKS", "SOCD", "MPT", "END"], out = new Set();
+    names.forEach((n, i) => { if (d[1 + (i >> 3)] & (1 << (i & 7))) out.add(n); });
+    return out;
+  }
+  async getAdvancedPositions(layer) {
+    const r = await this.transact(this.build([0x92, layer, 0, 1, 0, 0]), 0x92);
+    const out = [];
+    for (let i = 0; i + 1 < r[5]; i += 2) out.push(r[6 + i] * 256 + r[7 + i]);
+    return out;
+  }
+  async getAdvancedKey(layer, pos) {
+    const r = await this.transact(this.build([0x92, layer, 0, 1, 0, 2, ...pos16(pos)]), 0x92);
+    const u32 = (i) => ((r[i] << 24) | (r[i + 1] << 16) | (r[i + 2] << 8) | r[i + 3]) >>> 0;
+    const u16 = (i) => r[i] * 256 + r[i + 1];
+    const mm = (raw) => (raw * this.precision) / 1000;
+    switch (r[2]) {
+      case 1: return { type: "TGL", key: u32(8), delay: u16(12) };
+      case 2: return { type: "MT", hold: u32(8), tap: u32(12), delay: u16(16) };
+      case 3: return { type: "DKS", depths: [0, 1, 2, 3].map((k) => mm(u16(8 + k * 2))),
+        keys: [0, 1, 2, 3].map((k) => ({ value: u32(16 + k * 8), sets: r.slice(20 + k * 8, 24 + k * 8) })) };
+      case 4: { const n = r[6]; return { type: "SOCD", keys: Array.from({ length: n }, (_, k) => u16(7 + k * 2)), mode: r[7 + n * 2] }; }
+      case 5: return { type: "MPT", keys: Array.from({ length: r[8] }, (_, k) => ({ value: u32(9 + k * 6), depth: mm(u16(13 + k * 6)) })) };
+      case 6: return { type: "END", key: u32(8) };
+      default: return null;
+    }
+  }
+  async setAdvancedKey(layer, pos, a) {
+    const be32 = (v) => [(v >>> 24) & 0xff, (v >>> 16) & 0xff, (v >>> 8) & 0xff, v & 0xff];
+    const be16 = (v) => [(v >> 8) & 0xff, v & 0xff];
+    const raw = (mm) => Math.round((mm * 1000) / this.precision);
+    let type, data;
+    switch (a.type) {
+      case "TGL": type = 1; data = [...pos16(pos), ...be32(a.key), ...be16(a.delay)]; break;
+      case "MT": type = 2; data = [...pos16(pos), ...be32(a.hold), ...be32(a.tap), ...be16(a.delay)]; break;
+      case "DKS": type = 3; data = [...pos16(pos), ...a.depths.flatMap((d) => be16(raw(d))),
+        ...[0, 1, 2, 3].flatMap((k) => { const key = a.keys[k] || { value: 0, sets: [0, 0, 0, 0] }; return [...be32(key.value), ...key.sets]; })]; break;
+      case "SOCD": type = 4; data = [a.keys.length, ...a.keys.flatMap(pos16), a.mode]; break;
+      case "MPT": type = 5; data = [...pos16(pos), a.keys.length, ...a.keys.flatMap((k) => [...be32(k.value), ...be16(raw(k.depth))])]; break;
+      case "END": type = 6; data = [...pos16(pos), ...be32(a.key)]; break;
+      default: throw new Error("tipo de tecla avançada desconhecido: " + a.type);
+    }
+    // o app oficial manda estes tamanhos em [5] (MT e DKS um a menos/mais que os dados); copiamos igual
+    const len = { TGL: 8, MT: 11, DKS: 42, SOCD: data.length, MPT: data.length, END: 6 }[a.type];
+    await this.transact(this.build([0x12, layer, type, 1, 0, len], data), 0x12);
+  }
+  async deleteAdvancedKey(layer, pos) {
+    await this.transact(this.build([0x12, layer, 0, 1, 0, 2], [...pos16(pos), 0]), 0x12);
+  }
+
   // ---------- Zona morta ----------
   // Por tecla: zona morta de cima (evita toque acidental) e de baixo (evita a tecla "soltar" no fundo).
   // 8 bytes por tecla: pos16, cima16, baixo16 (em unidades de precisao), global, ligado.
