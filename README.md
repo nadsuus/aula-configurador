@@ -48,7 +48,8 @@ A tela segue o mesmo desenho do site oficial: perfis na lateral, abas em cima, t
 - **Teclas avançadas**: as funções são escolhidas numa grade por grupo, como no site; DKS, segurar/tocar (MT), liga-desliga (TGL), SOCD, profundidades (MPT)
   e ao soltar (END), conforme o teclado aceitar; até 40 por perfil
 - **Iluminação**: efeito, cor, multicolorido, brilho e velocidade, tanto da luz das teclas quanto da
-  **barra de luz** lateral
+  **barra de luz**. O desenho do teclado mostra uma prévia da luz configurada (cor, brilho, efeito) e
+  reage quando você aperta as teclas de verdade (Gatilho, Ondas ao digitar...)
 - **Desempenho**, para todas as teclas ou só as escolhidas (com atalhos Selecionar todas, WASD, Inverter):
   - ponto de acionamento
   - Rapid Trigger, com sensibilidade de apertar e soltar
