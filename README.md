@@ -37,11 +37,15 @@ A tela segue o mesmo desenho do site oficial: perfis na lateral, abas em cima, t
 
 - **Perfis**: troca entre os 3 perfis do teclado
 - **Botão**: troca a função de cada tecla nas camadas normal, Fn e Fn1 (teclas, mouse, atalhos,
-  multimídia), volta uma tecla ou a camada inteira ao padrão
+  multimídia), volta uma tecla ou a camada inteira ao padrão. Dá para escolher a tecla clicando no
+  desenho ou apertando ela no teclado, e uma barra mostra as teclas que você está apertando
+- **Atalhos**: segure Fn, aperte uma tecla e escolha o que sai (aspas `"` e `'`, `|`, `\`, `/`, `?`
+  ou qualquer combinação com Ctrl/Shift/Alt/AltGr/Win). Útil no teclado de 68 teclas com o Windows em
+  "Português (Brasil ABNT)", que não tem a tecla das aspas. Tem um campo para testar na hora
 - **Macro**: grava teclas com o tempo real entre elas, edita passos e esperas (até 150 passos),
   escolhe como roda (N vezes, enquanto segurar, repetir) e liga numa tecla pela aba Botão.
   O teclado não devolve as macros: a lista fica guardada no computador
-- **Teclas avançadas**: DKS, segurar/tocar (MT), liga-desliga (TGL), SOCD, profundidades (MPT)
+- **Teclas avançadas**: as funções são escolhidas numa grade por grupo, como no site; DKS, segurar/tocar (MT), liga-desliga (TGL), SOCD, profundidades (MPT)
   e ao soltar (END), conforme o teclado aceitar; até 40 por perfil
 - **Iluminação**: efeito, cor, multicolorido, brilho e velocidade, tanto da luz das teclas quanto da
   **barra de luz** lateral

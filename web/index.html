@@ -50,6 +50,37 @@
   /* Palco do teclado */
   .stage { position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 22px 16px 16px; }
   .stage-row { display: flex; gap: 16px; align-items: center; justify-content: center; }
+  .pressbar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-height: 38px; margin: -8px 0 14px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--card); }
+  .pressbar kbd { font: inherit; font-weight: 600; padding: 4px 10px; border-radius: 5px; border: 1px solid var(--key-line); background: var(--key); box-shadow: inset 0 -2px 0 rgba(0,0,0,.12); }
+  .pressbar kbd.on { border-color: var(--live-on); color: var(--live-on); }
+  .pressbar .plus { color: var(--muted); }
+  .pressbar .does { margin-left: 10px; color: var(--muted); }
+  .scpanel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 24px 20px; max-width: 900px; }
+  .scstep { display: flex; gap: 16px; padding: 18px 0; border-bottom: 1px solid var(--line); }
+  .scstep .num { flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; font-weight: 700; }
+  .scstep .body { flex: 1; display: grid; gap: 10px; justify-items: start; }
+  .scstep .body > b { font-size: 15px; }
+  .capture { display: flex; align-items: center; gap: 8px; min-height: 54px; padding: 8px 16px; min-width: 320px; border: 2px dashed var(--line); border-radius: 8px; background: var(--card); font-size: 18px; }
+  .capture.ok { border-style: solid; border-color: var(--accent); }
+  .capture.warn { border-color: #e8590c; }
+  .capture kbd, .preview kbd { font: inherit; font-weight: 700; padding: 4px 12px; border-radius: 6px; border: 1px solid var(--key-line); background: var(--key); box-shadow: inset 0 -2px 0 rgba(0,0,0,.12); }
+  .capture .plus, .preview .plus { color: var(--muted); }
+  .capture .msg { font-size: 13px; color: var(--muted); }
+  .symgrid { display: flex; flex-wrap: wrap; gap: 8px; }
+  .symgrid button { width: 104px; padding: 8px 6px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--text); cursor: pointer; }
+  .symgrid button big { display: block; font-size: 26px; font-weight: 700; line-height: 1.2; }
+  .symgrid button small { color: var(--muted); font-size: 11px; }
+  .symgrid button.active { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+  .sccombo { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .sccombo label { display: inline-flex; align-items: center; gap: 4px; padding: 5px 10px; border: 1px solid var(--line); border-radius: 5px; background: var(--card); cursor: pointer; }
+  .sccombo label:has(input:checked) { border-color: var(--accent); color: var(--accent); }
+  .preview { font-size: 18px; padding: 8px 14px; border-radius: 8px; background: var(--card); border: 1px solid var(--line); }
+  .sctest { font-size: 20px !important; width: min(520px, 100%); padding: 10px 12px !important; }
+  .scsaved { padding-top: 16px; display: grid; gap: 10px; }
+  .sclist { display: flex; flex-wrap: wrap; gap: 8px; }
+  .sclist .item { display: inline-flex; align-items: center; gap: 6px; padding: 3px 4px 3px 10px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
+  .sclist button { min-width: 0; border: 0; background: none; box-shadow: none; padding: 0 6px; color: var(--muted); cursor: pointer; font-size: 15px; }
+  .combo { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 14px 20px 0; }
   .kbwrap { overflow-x: auto; flex: 1; display: flex; justify-content: center; }
   #kb { position: relative; flex: none; }
   .key { position: absolute; border-radius: 5px; background: var(--key); border: 1px solid var(--key-line); box-shadow: inset 0 -3px 0 rgba(0,0,0,.08);
@@ -162,6 +193,12 @@
   .adved { display: grid; gap: 12px; background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 14px; margin-bottom: 12px; }
   .adved .grid4 { display: grid; grid-template-columns: 180px repeat(4, minmax(0, 1fr)); gap: 6px; align-items: center; }
   .adved .grid4 > span { color: var(--muted); font-size: 12px; }
+  .slot { font: inherit; min-width: 120px; padding: 6px 10px; text-align: left; border: 1px dashed var(--line); border-radius: 4px; background: var(--card); color: var(--text); cursor: pointer; }
+  .slot.empty { color: var(--muted); }
+  .slot.active { border: 1px solid var(--key-sel); box-shadow: 0 0 0 1px var(--key-sel); }
+  .advpick { border: 1px solid var(--line); border-radius: 6px; margin-bottom: 12px; background: var(--card); }
+  .advpick > .note { padding: 10px 20px 0; }
+  .advpick .codes { max-height: 260px; overflow-y: auto; }
   .key.adv { background: #efe6fd; border-color: var(--purple); }
   .key.adv i { color: var(--purple); }
   @media (prefers-color-scheme: dark) { .key.adv { background: #2d2440; } }
@@ -227,6 +264,7 @@
   <div class="main">
     <nav class="tabs" id="tabs">
       <button data-tab="button"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v12H3zm2 2v2h2V8zm3 0v2h2V8zm3 0v2h2V8zm3 0v2h2V8zm3 0v2h2V8zM5 11v2h2v-2zm3 0v2h2v-2zm3 0v2h2v-2zm3 0v2h2v-2zm3 0v2h2v-2zM7 14v2h10v-2z"/></svg>BOTÃO</button>
+      <button data-tab="sc"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 7h7v10H3zm11 0h7v10h-7zM11 11h2v2h-2z"/></svg>ATALHOS</button>
       <button data-tab="light"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2zM9 19h6v1a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2z"/></svg>ILUMINAÇÃO</button>
       <button data-tab="macro"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h12v4h4v12H8v-4H4zm2 2v8h2V8h6V6z"/></svg>MACRO</button>
       <button data-tab="perf" class="active"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 12h3v8H5zm5.5-8h3v16h-3zM16 9h3v11h-3z"/></svg>DESEMPENHO</button>
@@ -245,6 +283,7 @@
     <div id="ui" class="hidden">
       <!-- Teclado desenhado (Iluminacao e Desempenho) -->
       <div class="stage" id="stage">
+        <div class="pressbar hidden" id="pressbar"><span class="note">Aperte teclas no teclado: elas aparecem aqui.</span></div>
         <div class="stage-row">
           <div class="kbwrap"><div id="kb"></div></div>
           <div class="stage-side hidden" id="selbtns">
@@ -329,11 +368,39 @@
       <!-- Botao: funcao de cada tecla -->
       <div class="btnpanel hidden" id="tab-button">
         <div class="btnhead">
-          <div id="btninfo">Clique numa tecla do desenho e depois escolha a nova função abaixo.</div>
+          <div id="btninfo">Clique numa tecla do desenho (ou aperte ela no teclado) e depois escolha a nova função abaixo.</div>
           <button class="btn" id="keyreset" disabled>Voltar ao padrão</button>
         </div>
         <div class="cats" id="cats"></div>
         <div class="codes off" id="codes"></div>
+      </div>
+
+      <!-- Atalhos -->
+      <div class="scpanel hidden" id="tab-sc">
+        <div class="scstep"><div class="num">1</div><div class="body">
+          <b>Aperte o atalho no teclado</b>
+          <span class="note">Segure <b>Fn</b> e aperte uma tecla, por exemplo Fn + S.</span>
+          <div class="capture" id="sccap"></div>
+          <span class="note">Se preferir, escolha aqui: Fn + <select class="in" id="sckey"></select></span>
+        </div></div>
+        <div class="scstep"><div class="num">2</div><div class="body">
+          <b>O que deve sair quando apertar?</b>
+          <div class="symgrid" id="scsyms"></div>
+          <div class="sccombo hidden" id="sccombo"></div>
+        </div></div>
+        <div class="scstep"><div class="num">3</div><div class="body">
+          <b>Salve</b>
+          <div class="row"><div class="preview" id="scprev"></div><button class="btn blue" id="scadd">Salvar no teclado</button></div>
+        </div></div>
+        <div class="scstep"><div class="num">4</div><div class="body">
+          <b>Teste</b>
+          <input type="text" id="sctest" class="sctest" placeholder="Clique aqui e aperte o atalho (ex.: Fn + S)">
+        </div></div>
+        <div class="scsaved">
+          <b>Seus atalhos</b>
+          <div class="sclist" id="sclist"></div>
+          <p class="note">Os símbolos prontos funcionam com o Windows no teclado "Português (Brasil ABNT)".</p>
+        </div>
       </div>
 
       <!-- Teclas avancadas -->
@@ -344,6 +411,11 @@
         </div>
         <div class="types" id="advtypes"></div>
         <div class="adved hidden" id="adved"></div>
+        <div class="advpick hidden" id="advpick">
+          <div class="note" id="advpickinfo"></div>
+          <div class="cats" id="advcats"></div>
+          <div class="codes" id="advcodes"></div>
+        </div>
         <div class="row">
           <button class="btn blue" id="advsave" disabled>Gravar no teclado</button>
           <button class="btn" id="advdel" disabled>Remover função avançada</button>
@@ -437,17 +509,21 @@ const mm = (v) => `${Number(v).toFixed(2)} mm`;
 function setTab(t) {
   if (liveMode && t !== "perf") stopLiveMode();
   tab = t;
+  if (t === "button" || t === "sc") startBtnLive(); else stopBtnLive();
   document.querySelectorAll("#tabs button").forEach((b) => b.classList.toggle("active", b.dataset.tab === t));
   $("tab-perf").classList.toggle("hidden", t !== "perf");
   $("tab-light").classList.toggle("hidden", t !== "light");
   $("tab-button").classList.toggle("hidden", t !== "button");
   $("tab-adv").classList.toggle("hidden", t !== "adv");
+  $("tab-sc").classList.toggle("hidden", t !== "sc");
+  if (t === "sc") drawShortcut();
   $("tab-macro").classList.toggle("hidden", t !== "macro" || !kb);
   if (t === "macro") $("ui").classList.add("hidden"); else if (kb) $("ui").classList.remove("hidden");
   if (t === "macro") stopRecording();
   $("layerbox").classList.toggle("hidden", t !== "button");
+  $("pressbar").classList.toggle("hidden", t !== "button");
   $("tab-device").classList.toggle("hidden", t !== "device");
-  $("stage").classList.toggle("hidden", t === "device");
+  $("stage").classList.toggle("hidden", t === "device" || t === "sc");
   $("perfseg").classList.toggle("hidden", t !== "perf" || !!liveMode);
   $("lightseg").classList.toggle("hidden", t !== "light");
   $("selbtns").classList.toggle("hidden", !(t === "perf" && perfMode === "individual" && !liveMode));
@@ -711,7 +787,124 @@ function describe(entry) {
   if (entry.macro !== null) return `Macro: ${macros[entry.macro]?.name ?? "nº " + (entry.macro + 1)}`;
   if (entry.value === 0) return layer === 0 ? "Desativada" : "Nenhuma";
   if (entry.value === 0xffffffff) return "Desconhecida";
-  return codeName.get(entry.value) ?? "0x" + entry.value.toString(16).padStart(8, "0");
+  return symName(entry.value) ?? codeName.get(entry.value) ?? comboName(entry.value) ?? "0x" + entry.value.toString(16).padStart(8, "0");
+}
+// ---------- Criar atalho ----------
+// O teclado troca de camada so com Fn/Fn1, entao o gatilho e "[nada | Fn | Fn1] + tecla".
+// O resultado e um codigo com modificadores: tipo 00, byte 2 = modificadores, bytes 3-4 = tecla.
+// Simbolos prontos para o Windows em "Portugues (Brasil ABNT)": as teclas ABNT que faltam no
+// teclado de 68 teclas (a da esquerda do 1, a \| e a /?) sao mandadas pelo codigo delas.
+const SYMBOLS = [
+  [0x00020035, 'Aspas duplas "'], [0x00000035, "Aspas simples '"],
+  [0x00020064, "Barra reta |"], [0x00000064, "Barra invertida \\"],
+  [0x00400014, "Barra /"], [0x0040001a, "Interrogação ?"],
+];
+const symName = (v) => SYMBOLS.find(([x]) => x === v)?.[1];
+if (!codeName.has(0x64)) codeName.set(0x64, "\\ | (tecla ABNT)");
+if (!codeName.has(0x87)) codeName.set(0x87, "/ ? (tecla ABNT)");
+const RESULT_KEYS = [...KEYCODES[0].keys.filter(([, v]) => v > 0 && v <= 0xff && !(v >= 0xe0 && v <= 0xe7)).map(([l, v]) => [l, v]),
+  [codeName.get(0x64), 0x64], [codeName.get(0x87), 0x87]];
+const RESULT_MODS = [[1, "Ctrl"], [2, "Shift"], [4, "Alt"], [0x40, "AltGr"], [8, "Win"]];
+const sc = { layer: 1, pos: null, mode: "sym", sym: SYMBOLS[0][0], mods: 0, key: 0, cap: null };
+const isFnKey = (p) => [FN, FN1].includes(keymap[0]?.[p]?.value);
+const scValue = () => (sc.mode === "sym" ? sc.sym : sc.key ? ((sc.mods << 16) | sc.key) >>> 0 : 0);
+// Tela de atalhos (aba ATALHOS): sc.pos = tecla escolhida (sempre com Fn), sc.cap = estado da captura.
+const SYM_GLYPH = { 0x00020035: '"', 0x00000035: "'", 0x00020064: "|", 0x00000064: "\\", 0x00400014: "/", 0x0040001a: "?" };
+function drawShortcut() {
+  if (!layout.length) return;
+  const trigKeys = layout.filter((k, i, a) => a.findIndex((x) => x.p === k.p) === i && !isFnKey(k.p));
+  if (sc.pos === null || isFnKey(sc.pos)) sc.pos = layout.find((k) => k.n === "S")?.p ?? trigKeys[0]?.p;
+  sc.layer = 1;
+  // 1. captura
+  const cap = $("sccap");
+  cap.className = "capture" + (sc.cap === "warn" ? " warn" : sc.cap === "fn" ? "" : " ok");
+  if (sc.cap === "fn") cap.innerHTML = `<kbd>Fn</kbd><span class="plus">+</span><span class="msg">agora aperte a tecla...</span>`;
+  else if (sc.cap === "warn") cap.innerHTML = `<span class="msg">Faltou segurar o Fn. Segure Fn e aperte a tecla de novo.</span>`;
+  else { cap.innerHTML = `<kbd>Fn</kbd><span class="plus">+</span><kbd></kbd>`; cap.querySelectorAll("kbd")[1].textContent = keyNameOf(sc.pos); }
+  if ($("sckey").options.length !== trigKeys.length)
+    $("sckey").innerHTML = trigKeys.map((k) => `<option value="${k.p}"></option>`).join("");
+  [...$("sckey").options].forEach((o, i) => (o.textContent = keyNameOf(trigKeys[i].p)));
+  $("sckey").value = sc.pos;
+  // 2. resultado
+  $("scsyms").innerHTML = SYMBOLS.map(([v]) => `<button data-v="${v}" class="${sc.mode === "sym" && sc.sym === v ? "active" : ""}"><big></big><small></small></button>`).join("")
+    + `<button data-v="combo" class="${sc.mode === "keys" ? "active" : ""}"><big>⌨</big><small>Outra combinação</small></button>`;
+  $("scsyms").querySelectorAll("button").forEach((b, i) => {
+    if (i < SYMBOLS.length) { b.querySelector("big").textContent = SYM_GLYPH[SYMBOLS[i][0]]; b.querySelector("small").textContent = SYMBOLS[i][1].replace(/ .$/, ""); }
+    b.onclick = () => { if (b.dataset.v === "combo") sc.mode = "keys"; else { sc.mode = "sym"; sc.sym = Number(b.dataset.v); } drawShortcut(); };
+  });
+  const combo = $("sccombo");
+  combo.classList.toggle("hidden", sc.mode !== "keys");
+  if (sc.mode === "keys") {
+    combo.innerHTML = RESULT_MODS.map(([b, n]) => `<label><input type="checkbox" value="${b}" ${sc.mods & b ? "checked" : ""}> ${n}</label><span class="plus">+</span>`).join("")
+      + `<select class="in" id="scrk"><option value="0">escolha a tecla</option>${RESULT_KEYS.map(([, v]) => `<option value="${v}"></option>`).join("")}</select>`;
+    $("scrk").querySelectorAll("option").forEach((o, i) => { if (i) o.textContent = RESULT_KEYS[i - 1][0]; });
+    $("scrk").value = sc.key;
+    combo.querySelectorAll("input").forEach((c) => (c.onchange = () => { sc.mods ^= Number(c.value); drawShortcut(); }));
+    $("scrk").onchange = () => { sc.key = Number($("scrk").value); drawShortcut(); };
+  }
+  // 3. previa e salvar
+  const v = scValue();
+  $("scprev").innerHTML = `<kbd>Fn</kbd> <span class="plus">+</span> <kbd></kbd> <span class="plus">&nbsp;→&nbsp;</span> <b></b>`;
+  $("scprev").querySelectorAll("kbd")[1].textContent = keyNameOf(sc.pos);
+  $("scprev").querySelector("b").textContent = v ? describe({ value: v, macro: null }) : "escolha o que deve sair";
+  const same = FN_LAYERS.every((l) => keymap[l]?.[sc.pos]?.value === v);
+  $("scadd").disabled = !v || !kb || same;
+  $("scadd").textContent = same ? "Já salvo ✓" : "Salvar no teclado";
+  $("sctest").placeholder = `Clique aqui e aperte Fn + ${keyNameOf(sc.pos)}`;
+  drawShortcutList();
+}
+$("sckey").onchange = () => { sc.pos = Number($("sckey").value); sc.cap = null; drawShortcut(); };
+$("scadd").onclick = () => createShortcut(sc.pos, scValue());
+// A tecla Fn fisica pode ligar a camada "Fn" (1) ou "Fn1" (2) conforme o modelo (no HERO 68 ela tem
+// o codigo Fn1). Para o atalho funcionar sempre, ele e gravado nas duas.
+const FN_LAYERS = [1, 2];
+function shortcutEntries() {
+  const out = new Map();
+  for (const l of FN_LAYERS) for (const [p, e] of Object.entries(keymap[l] || {})) {
+    const v = e.value;
+    if (e.macro !== null || !v || v === 0xffffffff || v >>> 24 !== 0) continue;
+    if (symName(v) || ((v >> 16) & 0xff)) out.set(`${p}:${v}`, [Number(p), v]);
+  }
+  return [...out.values()];
+}
+function drawShortcutList() {
+  const list = shortcutEntries();
+  $("sclist").innerHTML = list.length ? list.map(() => `<span class="item"></span>`).join("") : `<span class="note">Nenhum ainda.</span>`;
+  if (!list.length) return;
+  $("sclist").querySelectorAll(".item").forEach((el, i) => {
+    const [p, v] = list[i];
+    el.textContent = `Fn + ${keyNameOf(p)} → ${describe({ value: v, macro: null })}`;
+    const x = document.createElement("button"); x.textContent = "×"; x.title = "Remover atalho";
+    x.onclick = () => guarded(`Removendo Fn + ${keyNameOf(p)}`, async () => {
+      for (const l of FN_LAYERS) if (keymap[l]?.[p]?.value === v) await writeLayerKey(l, p, 0);
+    });
+    el.appendChild(x);
+  });
+}
+async function writeLayerKey(l, pos, value) {
+  await kb.setKeymap(l, [{ pos, value }]);
+  keymap[l] = { ...keymap[l], ...(await kb.getKeymap(l, [pos])) };
+  updateKeys(); showPicked();
+  if (tab === "sc") drawShortcut();
+}
+function createShortcut(pos, value) {
+  guarded("Salvando atalho", async () => {
+    for (const l of FN_LAYERS) if (!keymap[l]) await loadLayer(l);
+    const busy = FN_LAYERS.map((l) => keymap[l][pos]).find((e) => e && e.value && e.value !== 0xffffffff && e.value !== value);
+    if (busy && !confirm(`Fn + ${keyNameOf(pos)} hoje faz: ${describe(busy)}. Trocar pelo atalho?`)) return;
+    for (const l of FN_LAYERS) await writeLayerKey(l, pos, value);
+  });
+}
+
+// Combinacao: tipo 00, byte 2 = modificadores (01 Ctrl, 02 Shift, 04 Alt, 08 Win), bytes 3-4 = tecla.
+function comboName(v) {
+  if (v >>> 24 !== 0) return null;
+  if (symName(v)) return symName(v);
+  const mods = (v >> 16) & 0xff, key = codeName.get(v & 0xffff);
+  if (!mods || !key) return null;
+  const bits = [[1, "Ctrl"], [0x10, "Ctrl"], [2, "Shift"], [0x20, "Shift"], [4, "Alt"], [0x40, "AltGr"], [8, "Win"], [0x80, "Win"]];
+  const names = [...new Set(bits.filter(([b]) => mods & b).map(([, n]) => n))];
+  return [...names, key].join(" + ");
 }
 function isChanged(pos) {
   const e = keymap[layer]?.[pos]; if (!e) return false;
@@ -727,7 +920,8 @@ function showKeyFunction(pos, e) {
   e.el.title = `${e.n}: ${describe(keymap[layer]?.[pos])}`;
 }
 function drawCats() {
-  $("cats").innerHTML = KEYCODES.map((c) => `<button data-c="${c.id}">${c.name}</button>`).join("") + `<button data-c="macros">Macros</button>`;
+  const cs = KEYCODES.map((c) => `<button data-c="${c.id}">${c.name}</button>`);
+  $("cats").innerHTML = cs.join("") + `<button data-c="macros">Macros</button>`;
   document.querySelectorAll("#cats button").forEach((b) => (b.onclick = () => { cat = b.dataset.c; drawCodes(); }));
 }
 function drawCodes() {
@@ -752,12 +946,16 @@ function drawCodes() {
 function showPicked() {
   const e = picked !== null ? keyEls[picked] : null;
   const lname = ["camada normal", "camada Fn", "camada Fn1"][layer];
-  $("btninfo").innerHTML = e ? `Tecla <b></b> (${lname}) faz agora: <b></b> — escolha a nova função abaixo` : "Clique numa tecla do desenho e depois escolha a nova função abaixo.";
+  $("btninfo").innerHTML = e ? `Tecla <b></b> (${lname}) faz agora: <b></b> — escolha a nova função abaixo` : "Clique numa tecla do desenho (ou aperte ela no teclado) e depois escolha a nova função abaixo.";
   if (e) { const bs = $("btninfo").querySelectorAll("b"); bs[0].textContent = e.n; bs[1].textContent = describe(keymap[layer]?.[picked]); }
   $("keyreset").disabled = !(e && layer === 0 && isChanged(picked) && defaultCode(picked) !== undefined);
   drawCodes();
+  if (tab === "button") drawPressBar();
 }
-function pickKey(pos) { picked = picked === pos ? null : pos; updateKeys(); showPicked(); }
+function pickKey(pos) {
+  picked = picked === pos ? null : pos;
+  updateKeys(); showPicked();
+}
 async function writeKey(pos, value) {
   await kb.setKeymap(layer, [{ pos, value }]);
   keymap[layer] = { ...keymap[layer], ...(await kb.getKeymap(layer, [pos])) };
@@ -769,7 +967,7 @@ function assign(value) {
   // Sem tecla Fn na camada normal nao da para chegar nas camadas Fn; o app ainda consegue restaurar.
   if (layer === 0 && (cur === FN || cur === FN1) && value !== cur
     && !confirm("Esta é a tecla Fn. Trocando ela, você perde o acesso à camada Fn pelo teclado (dá para restaurar por aqui). Continuar?")) return;
-  guarded(`Gravando ${keyEls[pos].n} = ${codeName.get(value) ?? value}`, () => writeKey(pos, value));
+  guarded(`Gravando ${keyEls[pos].n} = ${codeName.get(value) ?? comboName(value) ?? value}`, () => writeKey(pos, value));
 }
 // Ligar uma macro a uma tecla: envia as macros antes (o teclado guarda pelo numero), depois o codigo.
 function assignMacro(i) {
@@ -798,6 +996,90 @@ $("layerreset").onclick = () => {
   guarded("Restaurando camada", async () => { await kb.resetLayer(layer); await loadLayer(layer); updateKeys(); showPicked(); });
 };
 drawCats(); drawCodes();
+
+// ---------- Botao: apertar a tecla de verdade tambem escolhe ----------
+// Usa o mesmo fluxo do "curso ao vivo" (so leitura): a tecla afunda no desenho e fica escolhida.
+let btnLive = false, btnTimer = null;
+const btnDown = new Set(), btnRecent = new Map();
+async function startBtnLive() {
+  if (btnLive || !kb || liveMode) return;
+  btnLive = true; btnDown.clear(); btnRecent.clear();
+  const k = kb;
+  k.onLive = onBtnLive;
+  try { await k.liveStart(); } catch (e) { btnLive = false; k.onLive = null; log("!!", `teclas ao vivo: ${e.message}`); return; }
+  if (!btnLive || kb !== k) return k.liveStop().catch(() => {}); // saiu da aba enquanto ligava
+  btnTimer = setInterval(() => {
+    const now = performance.now();
+    for (const [p, t] of btnRecent) if (now - t > 1000) btnRecent.delete(p);
+    if (btnRecent.size) k.liveWatch([...btnRecent.keys()]).catch(() => {});
+  }, 100);
+}
+async function stopBtnLive() {
+  if (!btnLive) return;
+  btnLive = false; clearInterval(btnTimer); btnTimer = null;
+  for (const e of Object.values(keyEls)) { e.fill.style.height = "0"; e.el.classList.remove("on"); }
+  if (kb && kb.onLive === onBtnLive) { kb.onLive = null; await kb.liveStop().catch(() => {}); }
+}
+function onBtnLive(keys) {
+  if (tab === "sc") return onScLive(keys);
+  if (tab !== "button") return;
+  const now = performance.now();
+  for (const k of keys) {
+    const e = keyEls[k.pos]; if (!e) continue;
+    e.fill.style.height = `${Math.min(1, k.mm / keyMax(k.pos)) * 100}%`;
+    const down = k.mm > 0.3;
+    e.el.classList.toggle("on", down);
+    if (k.mm > 0.005) btnRecent.set(k.pos, now);
+    if (down && !btnDown.has(k.pos)) {
+      if (!btnDown.size) pressSeq = [];           // comecou uma nova combinacao
+      btnDown.add(k.pos); if (!pressSeq.includes(k.pos)) pressSeq.push(k.pos);
+      picked = k.pos;
+      updateKeys(); showPicked(); drawPressBar();
+    } else if (!down && btnDown.delete(k.pos)) drawPressBar();
+  }
+}
+// Aba Atalhos: segurar Fn e apertar uma tecla escolhe o gatilho (a tecla Fn do HERO 68 tem o
+// codigo "Fn1" e liga a camada Fn). Enquanto o campo de teste esta em uso, nao captura.
+function onScLive(keys) {
+  if (document.activeElement === $("sctest")) return;
+  const now = performance.now();
+  for (const k of keys) {
+    if (k.mm > 0.005) btnRecent.set(k.pos, now);
+    const down = k.mm > 0.3;
+    if (down && !btnDown.has(k.pos)) {
+      btnDown.add(k.pos);
+      if (isFnKey(k.pos)) sc.cap = "fn";
+      else if ([...btnDown].some(isFnKey)) { sc.pos = k.pos; sc.cap = null; }
+      else sc.cap = "warn";
+      drawShortcut();
+    } else if (!down && btnDown.delete(k.pos)) {
+      if (isFnKey(k.pos) && sc.cap === "fn") { sc.cap = null; drawShortcut(); }
+    }
+  }
+}
+// Barra acima do desenho: as teclas da ultima combinacao (acesas enquanto apertadas)
+// e o que a ultima tecla faz na camada escolhida.
+let pressSeq = [];
+const MOD_ORDER = ["Ctrl", "Shift", "Alt", "Win", "Fn", "Fn1"];
+function drawPressBar() {
+  const bar = $("pressbar");
+  if (!pressSeq.length) { bar.innerHTML = `<span class="note">Aperte teclas no teclado: elas aparecem aqui.</span>`; return; }
+  const name = (p) => keyEls[p]?.name ?? keyNameOf(p);
+  const rank = (p) => { const i = MOD_ORDER.findIndex((m) => name(p).startsWith(m)); return i < 0 ? 99 : i; };
+  const seq = [...pressSeq].sort((a, b) => rank(a) - rank(b));
+  bar.innerHTML = seq.map((p, i) => `${i ? '<span class="plus">+</span>' : ""}<kbd class="${btnDown.has(p) ? "on" : ""}"></kbd>`).join("")
+    + `<span class="does"></span>`;
+  bar.querySelectorAll("kbd").forEach((k, i) => (k.textContent = name(seq[i])));
+  const last = pressSeq[pressSeq.length - 1];
+  bar.querySelector(".does").textContent = `· ${name(last)} faz: ${describe(keymap[layer]?.[last])}`;
+}
+// Na aba Botao as teclas apertadas nao podem acionar a tela (ex.: Espaco/Enter clicando
+// num botao de funcao focado e gravando sem querer).
+for (const ev of ["keydown", "keyup"]) window.addEventListener(ev, (e) => {
+  if (!(tab === "button" || tab === "sc") || !btnLive || e.ctrlKey || e.metaKey) return;
+  if (e.target === $("sctest")) return;
+  e.preventDefault();
+}, true);
 
 // ---------- Macros ----------
 // macros = [{ name, mode, count, steps: [{ code, up, delay }] }], guardadas no navegador/app.
@@ -956,9 +1238,42 @@ function showAdvKey(pos, e) {
   e.i.textContent = a ? a.type : "";
   e.el.title = a ? `${e.n}: ${ADV_TYPES[a.type]?.[0] ?? a.type}` : e.n;
 }
-function keySelect(id, value) {
-  const opts = KEYCODES.map((c) => `<optgroup label="${c.name}">${c.keys.map(([l, v]) => `<option value="${v}">${l}</option>`).join("")}</optgroup>`).join("");
-  return `<select class="in" id="${id}"><option value="0">— nenhuma —</option>${opts}</select>`;
+// Cada campo de funcao e um "espaco": clique nele e escolha a funcao na grade abaixo (como no site).
+let advSlots = {}, advSlot = null, advCat = KEYCODES[0].id;
+const keySlot = (id) => `<button type="button" class="slot" id="${id}"></button>`;
+const slotLabel = (v) => (v ? codeName.get(v) ?? "0x" + (v >>> 0).toString(16).padStart(8, "0") : "— nenhuma —");
+function bindSlot(id, name, get, set) {
+  advSlots[id] = { name, get, set };
+  $(id).onclick = () => { advSlot = id; drawAdvPick(); };
+}
+function drawAdvPick() {
+  const ids = Object.keys(advSlots);
+  if (!ids.includes(advSlot)) advSlot = ids[0] ?? null;
+  $("advpick").classList.toggle("hidden", !advSlot);
+  for (const id of ids) {
+    const v = advSlots[id].get();
+    $(id).textContent = slotLabel(v);
+    $(id).classList.toggle("empty", !v);
+    $(id).classList.toggle("active", id === advSlot);
+  }
+  if (!advSlot) return;
+  const sl = advSlots[advSlot], cur = sl.get();
+  $("advpickinfo").textContent = `Escolhendo: ${sl.name}. Clique em outro campo acima para trocar.`;
+  $("advcats").innerHTML = KEYCODES.map((c) => `<button data-c="${c.id}" class="${c.id === advCat ? "active" : ""}">${c.name}</button>`).join("");
+  $("advcats").querySelectorAll("button").forEach((b) => (b.onclick = () => { advCat = b.dataset.c; drawAdvPick(); }));
+  const c = KEYCODES.find((x) => x.id === advCat);
+  $("advcodes").innerHTML = `<button data-v="0" class="${cur === 0 ? "cur" : ""}">— nenhuma —</button>`
+    + c.keys.map(([label, v]) => `<button data-v="${v}" class="${v === cur ? "cur" : ""}"></button>`).join("");
+  $("advcodes").querySelectorAll("button").forEach((b, i) => {
+    if (i > 0) b.textContent = c.keys[i - 1][0];
+    b.onclick = () => {
+      sl.set(Number(b.dataset.v));
+      // como no site: depois de escolher, passa para o proximo campo vazio
+      const next = ids.find((id) => id !== advSlot && !advSlots[id].get());
+      if (next && Number(b.dataset.v)) advSlot = next;
+      drawAdvPick();
+    };
+  });
 }
 function pickAdv(pos) {
   advPicked = advPicked === pos ? null : pos;
@@ -997,35 +1312,36 @@ function showAdvPanel() {
 function drawAdvEditor() {
   const d = advDraft, ed = $("adved");
   ed.classList.toggle("hidden", !d);
-  if (!d) { ed.innerHTML = ""; return; }
+  advSlots = {};
+  if (!d) { ed.innerHTML = ""; drawAdvPick(); return; }
   if (d.type === "DKS") {
     if (!d.ui) { d.keys = d.keys.map((k) => ({ value: k.value, sets: dksFromRaw(k.sets) })); d.ui = true; }
     ed.innerHTML = `<div class="grid4"><span>Ponto do curso (mm)</span>${d.depths.map((v, i) => `<label class="field"><span>${i + 1}. ${DKS_STAGES[i]}</span><input type="number" step="0.01" min="0.1" max="4" value="${v.toFixed(2)}" data-dep="${i}"></label>`).join("")}</div>
-      ${d.keys.map((k, r) => `<div class="grid4">${keySelect("dk" + r, k.value)}${DKS_OPTS.map((opts, c) => `<select class="in" data-r="${r}" data-c="${c}">${opts.map(([v, t]) => `<option value="${v}">${t}</option>`).join("")}</select>`).join("")}</div>`).join("")}
+      ${d.keys.map((k, r) => `<div class="grid4">${keySlot("dk" + r)}${DKS_OPTS.map((opts, c) => `<select class="in" data-r="${r}" data-c="${c}">${opts.map(([v, t]) => `<option value="${v}">${t}</option>`).join("")}</select>`).join("")}</div>`).join("")}
       <p class="note">"Toque" aperta e solta na hora; "Segura" mantém a tecla apertada enquanto o curso estiver naquela parte.</p>`;
-    d.keys.forEach((k, r) => { $("dk" + r).value = k.value; $("dk" + r).onchange = () => (k.value = Number($("dk" + r).value)); });
+    d.keys.forEach((k, r) => bindSlot("dk" + r, `função ${r + 1}`, () => k.value, (v) => (k.value = v)));
     ed.querySelectorAll("select[data-r]").forEach((s) => { const k = d.keys[s.dataset.r]; s.value = k.sets[s.dataset.c]; s.onchange = () => (k.sets[s.dataset.c] = Number(s.value)); });
     ed.querySelectorAll("input[data-dep]").forEach((inp) => (inp.onchange = () => (d.depths[inp.dataset.dep] = Math.max(0.1, Math.min(4, Number(inp.value) || 0.1)))));
   } else if (d.type === "MT") {
-    ed.innerHTML = `<div class="row"><label class="field"><span>Ao segurar</span>${keySelect("mth")}</label><label class="field"><span>Ao tocar</span>${keySelect("mtt")}</label>
+    ed.innerHTML = `<div class="row"><label class="field"><span>Ao segurar</span>${keySlot("mth")}</label><label class="field"><span>Ao tocar</span>${keySlot("mtt")}</label>
       <label class="field"><span>Segurar a partir de (ms)</span><input type="number" id="mtd" min="50" max="2000"></label></div>`;
-    $("mth").value = d.hold; $("mtt").value = d.tap; $("mtd").value = d.delay;
-    $("mth").onchange = () => (d.hold = Number($("mth").value)); $("mtt").onchange = () => (d.tap = Number($("mtt").value));
+    $("mtd").value = d.delay;
+    bindSlot("mth", "ao segurar", () => d.hold, (v) => (d.hold = v)); bindSlot("mtt", "ao tocar", () => d.tap, (v) => (d.tap = v));
     $("mtd").onchange = () => (d.delay = Math.max(1, Math.min(65535, Number($("mtd").value) || 200)));
   } else if (d.type === "TGL") {
-    ed.innerHTML = `<div class="row"><label class="field"><span>Tecla</span>${keySelect("tgk")}</label><label class="field"><span>Toque curto até (ms)</span><input type="number" id="tgd" min="50" max="2000"></label></div>
+    ed.innerHTML = `<div class="row"><label class="field"><span>Tecla</span>${keySlot("tgk")}</label><label class="field"><span>Toque curto até (ms)</span><input type="number" id="tgd" min="50" max="2000"></label></div>
       <p class="note">Toque curto prende/solta a tecla; segurando mais que esse tempo ela funciona normal.</p>`;
-    $("tgk").value = d.key; $("tgd").value = d.delay;
-    $("tgk").onchange = () => (d.key = Number($("tgk").value)); $("tgd").onchange = () => (d.delay = Math.max(1, Math.min(65535, Number($("tgd").value) || 200)));
+    $("tgd").value = d.delay;
+    bindSlot("tgk", "tecla", () => d.key, (v) => (d.key = v)); $("tgd").onchange = () => (d.delay = Math.max(1, Math.min(65535, Number($("tgd").value) || 200)));
   } else if (d.type === "END") {
-    ed.innerHTML = `<div class="row"><label class="field"><span>Mandar ao soltar</span>${keySelect("enk")}</label></div>`;
-    $("enk").value = d.key; $("enk").onchange = () => (d.key = Number($("enk").value));
+    ed.innerHTML = `<div class="row"><label class="field"><span>Mandar ao soltar</span>${keySlot("enk")}</label></div>`;
+    bindSlot("enk", "mandar ao soltar", () => d.key, (v) => (d.key = v));
   } else if (d.type === "MPT") {
-    ed.innerHTML = d.keys.map((k, i) => `<div class="row"><label class="field"><span>Função ${i + 1}</span>${keySelect("mpk" + i)}</label>
+    ed.innerHTML = d.keys.map((k, i) => `<div class="row"><label class="field"><span>Função ${i + 1}</span>${keySlot("mpk" + i)}</label>
       <label class="field"><span>Na profundidade (mm)</span><input type="number" step="0.01" min="0.1" max="4" id="mpd${i}"></label></div>`).join("");
     d.keys.forEach((k, i) => {
-      $("mpk" + i).value = k.value; $("mpd" + i).value = k.depth.toFixed(2);
-      $("mpk" + i).onchange = () => (k.value = Number($("mpk" + i).value));
+      $("mpd" + i).value = k.depth.toFixed(2);
+      bindSlot("mpk" + i, `função ${i + 1}`, () => k.value, (v) => (k.value = v));
       $("mpd" + i).onchange = () => (k.depth = Math.max(0.1, Math.min(4, Number($("mpd" + i).value) || 0.1)));
     });
   } else if (d.type === "SOCD") {
@@ -1038,6 +1354,7 @@ function drawAdvEditor() {
     $("sc1").onchange = () => (d.keys[0] = Number($("sc1").value)); $("sc2").onchange = () => (d.keys[1] = Number($("sc2").value));
     $("scm").onchange = () => (d.mode = Number($("scm").value));
   }
+  drawAdvPick();
 }
 async function reloadAdv(positions) {
   const list = await kb.getAdvancedPositions(0);
@@ -1142,6 +1459,7 @@ document.querySelectorAll("#profiles button").forEach((b) => (b.onclick = () => 
 
 // ---------- Leitura e conexao ----------
 async function loadAll() {
+  await stopBtnLive();
   status("Lendo configurações...");
   const fw = await step("firmware", () => kb.firmware());
   $("fw").textContent = $("fw2").textContent = fw === undefined ? "?" : "0x" + fw.toString(16);
@@ -1161,7 +1479,9 @@ async function loadAll() {
   travel = (await step("curso", () => kb.getTravel(positions))) || {};
   rtv = (await step("rapid trigger", () => kb.getRT(positions))) || {};
   dz = (await step("zona morta", () => kb.getDeadZone(positions))) || {};
-  keymap = {}; await loadLayer(layer); picked = null; showPicked();
+  keymap = {}; await loadLayer(layer); if (layer !== 1) await loadLayer(1);
+  if (!keymap[2]) await loadLayer(2);
+  picked = null; sc.pos = null; showPicked();
   await loadAdvanced(); advPicked = null; showAdvPanel();
   setTab(tab); fillPerfControls();
   status("Pronto", "ok");
@@ -1170,6 +1490,7 @@ async function loadAll() {
 async function connect() {
   try {
     if (liveMode) await stopLiveMode();
+    await stopBtnLive();
     if (kb) { await kb.transport.close(); kb = null; }
     status("Procurando o teclado...");
     const t = await openTransport();
