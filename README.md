@@ -1,21 +1,43 @@
 # Configurador Aula HERO
 
 Configurador leve para os teclados Aula HERO (68 HE, 68 AIR, 68 MINI, 84 HE, 87 HE, 99, 100…),
-feito a partir da leitura do JavaScript público de hero.aulastar.com. Roda no navegador via WebHID.
+feito a partir da leitura do JavaScript público de hero.aulastar.com.
 
-## Como usar
+Funciona de dois jeitos, com a mesma tela:
 
-1. Ligue o teclado **no cabo USB** (o receptor 2.4G usa outro transporte e não é suportado).
-2. Sirva a pasta: `python3 -m http.server 8765 --bind 127.0.0.1`
-3. Abra no **Chrome ou Edge do Windows**: http://localhost:8765
-4. Clique em **Conectar teclado** e escolha o Aula na lista.
-5. Feche o site oficial antes: duas páginas falando com o teclado ao mesmo tempo embaralham as respostas.
+- **App para Windows** (Tauri): um programa normal, sem navegador. A parte em Rust fala com o USB.
+- **Página no navegador**: Chrome ou Edge, via WebHID.
+
+Nos dois casos: ligue o teclado **no cabo USB** (o receptor 2.4G não é suportado) e feche o site
+oficial antes. Dois programas falando com o teclado ao mesmo tempo embaralham as respostas.
+
+## App para Windows
+
+Na primeira vez, no Windows (PowerShell):
+
+1. Instale o Rust: baixe e rode o `rustup-init.exe` de https://rustup.rs. Quando ele oferecer,
+   instale também as ferramentas de C++ do Visual Studio.
+2. Instale o Tauri: `cargo install tauri-cli --version "^2" --locked` (demora alguns minutos).
+3. Pegue o projeto: `git clone https://github.com/nadsuus/aula-configurador C:\dev\aula-configurador`
+
+Depois, na pasta do projeto:
+
+- `cargo tauri dev`: abre o app em modo de teste (a primeira compilação demora).
+- `cargo tauri build`: gera o instalador em `src-tauri\target\release\bundle\nsis\`.
+
+## Página no navegador
+
+1. Sirva a pasta `web`: `python3 -m http.server 8765 --bind 127.0.0.1 --directory web`
+2. Abra no **Chrome ou Edge** do Windows: http://localhost:8765
+3. Clique em **Conectar teclado** e escolha o Aula na lista.
 
 ## O que faz
 
 A tela segue o mesmo desenho do site oficial: perfis na lateral, abas em cima, teclado no meio.
 
 - **Perfis**: troca entre os 3 perfis do teclado
+- **Botão**: troca a função de cada tecla nas camadas normal, Fn e Fn1 (teclas, mouse, atalhos,
+  multimídia), volta uma tecla ou a camada inteira ao padrão
 - **Iluminação**: efeito, cor, multicolorido, brilho e velocidade, tanto da luz das teclas quanto da
   **barra de luz** lateral
 - **Desempenho**, para todas as teclas ou só as escolhidas (com atalhos Selecionar todas, WASD, Inverter):
@@ -27,18 +49,20 @@ A tela segue o mesmo desenho do site oficial: perfis na lateral, abas em cima, t
 - **Dispositivo**: taxa de resposta (polling), suspensão, modo Mac, trava da tecla Windows
 - Log dos bytes enviados e recebidos
 
-As abas Botão, Macro e Teclas avançadas aparecem desativadas: esses comandos ainda não foram mapeados.
-
-De propósito **não** mexe em firmware, reset de fábrica ou macros.
+As abas Macro e Teclas avançadas aparecem desativadas: esses comandos ainda não foram mapeados.
+De propósito **não** mexe em firmware nem em reset de fábrica.
 
 ## Arquivos
 
-- `protocol.js`: o protocolo (formato do pacote, checksum e cada comando), comentado
-- `layouts.js`: posição das teclas de cada modelo, extraída do app oficial
-- `index.html`: a interface
+- `web/index.html`: a interface
+- `web/protocol.js`: o protocolo (formato do pacote, checksum e cada comando), comentado
+- `web/transport.js`: como os pacotes chegam ao teclado (WebHID no navegador, Rust no app)
+- `web/layouts.js`: posição das teclas de cada modelo, extraída do app oficial
+- `web/keycodes.js`: códigos das funções de tecla, extraídos do app oficial
+- `src-tauri/src/main.rs`: a parte em Rust do app (USB pela biblioteca hidapi)
 
 ## Aviso
 
 Projeto pessoal e não oficial, sem ligação com a Aula. Feito para usar o próprio teclado
-(interoperabilidade). Use por sua conta e risco. Os nomes de modelos e a posição das teclas
-vêm do configurador público da fabricante.
+(interoperabilidade). Use por sua conta e risco. Os nomes de modelos, a posição das teclas e os
+códigos das funções vêm do configurador público da fabricante.

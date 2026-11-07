@@ -114,6 +114,23 @@
   .dz { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: center; }
   .dz-row { display: flex; gap: 10px; align-items: center; justify-content: center; }
 
+  /* Botao (funcao das teclas) */
+  .layerbox { display: grid; gap: 10px; width: 150px; background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 14px; }
+  .layerbox label { display: flex; gap: 8px; align-items: center; cursor: pointer; }
+  .layerbox button { padding: 8px; border: 0; border-radius: 4px; background: var(--err); color: #fff; }
+  .key.changed { background: var(--accent-soft); border-color: var(--accent); }
+  .key.changed i { color: var(--accent); }
+  .key.pick { outline: 3px solid var(--key-sel); outline-offset: -3px; }
+  .btnpanel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+  .btnhead { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--line); }
+  .cats { display: flex; overflow-x: auto; border-bottom: 1px solid var(--line); background: var(--card); }
+  .cats button { flex: 1; min-width: 110px; padding: 10px 8px; border: 0; border-bottom: 2px solid transparent; background: none; color: var(--muted); }
+  .cats button.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .codes { display: flex; flex-wrap: wrap; gap: 6px; padding: 16px 20px; }
+  .codes button { min-width: 52px; padding: 9px 10px; border-radius: 6px; border: 1px solid var(--key-line); background: var(--key); color: var(--text); box-shadow: inset 0 -2px 0 rgba(0,0,0,.08); }
+  .codes button.cur { border-color: var(--key-sel); box-shadow: 0 0 0 1px var(--key-sel); }
+  .codes:has(+ .nopick) button, .codes.off button { opacity: .5; cursor: default; }
+
   /* Iluminacao */
   .light { display: grid; grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
   @media (max-width: 1100px) { .light { grid-template-columns: 1fr; } }
@@ -174,7 +191,7 @@
 
   <div class="main">
     <nav class="tabs" id="tabs">
-      <button data-tab="button" disabled title="Ainda não suportado"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v12H3zm2 2v2h2V8zm3 0v2h2V8zm3 0v2h2V8zm3 0v2h2V8zm3 0v2h2V8zM5 11v2h2v-2zm3 0v2h2v-2zm3 0v2h2v-2zm3 0v2h2v-2zm3 0v2h2v-2zM7 14v2h10v-2z"/></svg>BOTÃO</button>
+      <button data-tab="button"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v12H3zm2 2v2h2V8zm3 0v2h2V8zm3 0v2h2V8zm3 0v2h2V8zm3 0v2h2V8zM5 11v2h2v-2zm3 0v2h2v-2zm3 0v2h2v-2zm3 0v2h2v-2zm3 0v2h2v-2zM7 14v2h10v-2z"/></svg>BOTÃO</button>
       <button data-tab="light"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2zM9 19h6v1a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2z"/></svg>ILUMINAÇÃO</button>
       <button data-tab="macro" disabled title="Ainda não suportado"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h12v4h4v12H8v-4H4zm2 2v8h2V8h6V6z"/></svg>MACRO</button>
       <button data-tab="perf" class="active"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 12h3v8H5zm5.5-8h3v16h-3zM16 9h3v11h-3z"/></svg>DESEMPENHO</button>
@@ -185,7 +202,7 @@
     <div id="welcome" class="welcome">
       <div>
         <h1>Conecte o teclado</h1>
-        <p>Ligue o Aula HERO no <b>cabo USB</b>, feche o site oficial e use Chrome ou Edge. O navegador vai pedir permissão para acessar o teclado.</p>
+        <p>Ligue o Aula HERO no <b>cabo USB</b> e feche o site oficial.<span id="browserhint"> No navegador, use Chrome ou Edge: ele vai pedir permissão para acessar o teclado.</span></p>
         <button class="big" id="connect">CONECTAR TECLADO</button>
       </div>
     </div>
@@ -200,6 +217,12 @@
             <button id="selwasd">WASD</button>
             <button id="selnone">Limpar seleção</button>
             <button id="selinv">Inverter seleção</button>
+          </div>
+          <div class="layerbox hidden" id="layerbox">
+            <label><input type="radio" name="layer" value="0" checked> Normal</label>
+            <label><input type="radio" name="layer" value="1"> Segurando Fn</label>
+            <label><input type="radio" name="layer" value="2"> Segurando Fn1</label>
+            <button id="layerreset">Restaurar camada</button>
           </div>
         </div>
         <div class="seg-wrap hidden" id="lightseg">
@@ -268,6 +291,16 @@
         </section>
       </div>
 
+      <!-- Botao: funcao de cada tecla -->
+      <div class="btnpanel hidden" id="tab-button">
+        <div class="btnhead">
+          <div id="btninfo">Clique numa tecla do desenho e depois escolha a nova função abaixo.</div>
+          <button class="btn" id="keyreset" disabled>Voltar ao padrão</button>
+        </div>
+        <div class="cats" id="cats"></div>
+        <div class="codes off" id="codes"></div>
+      </div>
+
       <!-- Iluminacao -->
       <div class="light hidden" id="tab-light">
         <section><div class="modes" id="modes"></div></section>
@@ -306,7 +339,9 @@
 </div>
 
 <script src="layouts.js"></script>
+<script src="keycodes.js"></script>
 <script src="protocol.js"></script>
+<script src="transport.js"></script>
 <script>
 const $ = (id) => document.getElementById(id);
 let kb = null, layout = [], keyTypes = {}, travel = {}, rtv = {}, dz = {};
@@ -340,6 +375,8 @@ function setTab(t) {
   document.querySelectorAll("#tabs button").forEach((b) => b.classList.toggle("active", b.dataset.tab === t));
   $("tab-perf").classList.toggle("hidden", t !== "perf");
   $("tab-light").classList.toggle("hidden", t !== "light");
+  $("tab-button").classList.toggle("hidden", t !== "button");
+  $("layerbox").classList.toggle("hidden", t !== "button");
   $("tab-device").classList.toggle("hidden", t !== "device");
   $("stage").classList.toggle("hidden", t === "device");
   $("perfseg").classList.toggle("hidden", t !== "perf" || !!liveMode);
@@ -356,7 +393,7 @@ function drawKeyboard() {
   const kbEl = $("kb"); kbEl.innerHTML = ""; keyEls = {};
   const drawn = [];
   const maxX = Math.max(...layout.map((k) => k.x + k.w)), maxY = Math.max(...layout.map((k) => k.y + k.h));
-  const side = $("selbtns").classList.contains("hidden") ? 0 : 150;
+  const side = !$("selbtns").classList.contains("hidden") || !$("layerbox").classList.contains("hidden") ? 170 : 0;
   const avail = $("stage").clientWidth - 40 - side;
   const scale = Math.min(1.5, Math.max(0.7, avail / maxX));
   kbEl.style.width = `${maxX * scale + 2}px`; kbEl.style.height = `${maxY * scale + 2}px`;
@@ -383,6 +420,8 @@ function updateKeys() {
     e.el.classList.toggle("click", pickable);
     e.el.classList.toggle("sel", pickable && selected.has(pos));
     e.el.classList.toggle("rt", tab === "perf" && !liveMode && !!(r && r.on));
+    if (tab === "button") { showKeyFunction(pos, e); continue; }
+    e.el.classList.remove("changed", "pick");
     if (liveMode) continue;
     e.i.textContent = tab === "perf" && t ? t.mm.toFixed(2) : "";
     e.el.title = tab === "perf"
@@ -393,6 +432,7 @@ function updateKeys() {
 }
 
 function onKeyClick(pos) {
+  if (tab === "button") return pickKey(pos);
   if (!(tab === "perf" && perfMode === "individual") || liveMode) return;
   selected.has(pos) ? selected.delete(pos) : selected.add(pos);
   updateKeys(); fillPerfControls();
@@ -582,8 +622,89 @@ $("livestop").onclick = () => {
 window.addEventListener("beforeunload", () => {
   if (!kb || !liveMode) return;
   const p = liveMode === "live" ? [0x98, 2, 0, 1, 0, 0, 0] : [0x94, 4, 0, 1, 0, 0, 0];
-  kb.device.sendReport(REPORT_ID, new Uint8Array(kb.build(p)));
+  kb.transport.send(kb.build(p));
 });
+
+// ---------- Botao: funcao de cada tecla ----------
+// keymap[camada][pos] = { value, macro }. A camada 0 e lida ao conectar; Fn e Fn1 quando escolhidas.
+let keymap = {}, layer = 0, picked = null, cat = KEYCODES[0].id;
+const FN = 0x0d000000, FN1 = 0x0d010000;
+const codeName = new Map();
+for (const c of KEYCODES) for (const [label, v] of c.keys) if (!codeName.has(v)) codeName.set(v, label);
+const byOrigName = new Map(KEYCODES[0].keys.map(([label, v, orig]) => [orig, v]));
+// Codigo de fabrica da tecla na camada normal: o da tecla com o mesmo nome no desenho
+const defaultCode = (pos) => byOrigName.get(keyEls[pos]?.n ?? layout.find((k) => k.p === pos)?.n);
+function describe(entry) {
+  if (!entry) return "?";
+  if (entry.macro !== null) return `Macro ${entry.macro + 1}`;
+  if (entry.value === 0) return layer === 0 ? "Desativada" : "Nenhuma";
+  if (entry.value === 0xffffffff) return "Desconhecida";
+  return codeName.get(entry.value) ?? "0x" + entry.value.toString(16).padStart(8, "0");
+}
+function isChanged(pos) {
+  const e = keymap[layer]?.[pos]; if (!e) return false;
+  if (layer === 0) return e.value !== defaultCode(pos) || e.macro !== null;
+  return e.value !== 0 && e.value !== 0xffffffff && e.value !== defaultCode(pos);
+}
+function showKeyFunction(pos, e) {
+  const changed = isChanged(pos);
+  e.el.classList.add("click");
+  e.el.classList.toggle("changed", changed);
+  e.el.classList.toggle("pick", picked === pos);
+  e.i.textContent = changed ? describe(keymap[layer][pos]) : "";
+  e.el.title = `${e.n}: ${describe(keymap[layer]?.[pos])}`;
+}
+function drawCats() {
+  $("cats").innerHTML = KEYCODES.map((c) => `<button data-c="${c.id}">${c.name}</button>`).join("");
+  document.querySelectorAll("#cats button").forEach((b) => (b.onclick = () => { cat = b.dataset.c; drawCodes(); }));
+}
+function drawCodes() {
+  document.querySelectorAll("#cats button").forEach((b) => b.classList.toggle("active", b.dataset.c === cat));
+  const cur = picked !== null ? keymap[layer]?.[picked]?.value : undefined;
+  const c = KEYCODES.find((x) => x.id === cat);
+  $("codes").innerHTML = c.keys.map(([label, v]) => `<button data-v="${v}" class="${v === cur ? "cur" : ""}">${label}</button>`).join("");
+  $("codes").classList.toggle("off", picked === null);
+  document.querySelectorAll("#codes button").forEach((b) => (b.onclick = () => assign(Number(b.dataset.v))));
+}
+function showPicked() {
+  const e = picked !== null ? keyEls[picked] : null;
+  const lname = ["camada normal", "camada Fn", "camada Fn1"][layer];
+  $("btninfo").innerHTML = e ? `Tecla <b></b> (${lname}) faz agora: <b></b> — escolha a nova função abaixo` : "Clique numa tecla do desenho e depois escolha a nova função abaixo.";
+  if (e) { const bs = $("btninfo").querySelectorAll("b"); bs[0].textContent = e.n; bs[1].textContent = describe(keymap[layer]?.[picked]); }
+  $("keyreset").disabled = !(e && layer === 0 && isChanged(picked) && defaultCode(picked) !== undefined);
+  drawCodes();
+}
+function pickKey(pos) { picked = picked === pos ? null : pos; updateKeys(); showPicked(); }
+async function writeKey(pos, value) {
+  await kb.setKeymap(layer, [{ pos, value }]);
+  keymap[layer] = { ...keymap[layer], ...(await kb.getKeymap(layer, [pos])) };
+  updateKeys(); showPicked();
+}
+function assign(value) {
+  if (picked === null) return;
+  const pos = picked, cur = keymap[layer]?.[pos]?.value;
+  // Sem tecla Fn na camada normal nao da para chegar nas camadas Fn; o app ainda consegue restaurar.
+  if (layer === 0 && (cur === FN || cur === FN1) && value !== cur
+    && !confirm("Esta é a tecla Fn. Trocando ela, você perde o acesso à camada Fn pelo teclado (dá para restaurar por aqui). Continuar?")) return;
+  guarded(`Gravando ${keyEls[pos].n} = ${codeName.get(value) ?? value}`, () => writeKey(pos, value));
+}
+$("keyreset").onclick = () => {
+  const pos = picked, v = defaultCode(pos);
+  if (pos === null || v === undefined) return;
+  guarded(`Voltando ${keyEls[pos].n} ao padrão`, () => writeKey(pos, v));
+};
+async function loadLayer(l) { keymap[l] = (await step(`funções da camada ${l}`, () => kb.getKeymap(l, allPos()))) || {}; }
+document.querySelectorAll('input[name=layer]').forEach((r) => (r.onchange = () => guarded("Lendo camada", async () => {
+  layer = Number(r.value);
+  if (!keymap[layer]) await loadLayer(layer);
+  updateKeys(); showPicked();
+})));
+$("layerreset").onclick = () => {
+  const lname = ["normal", "Fn", "Fn1"][layer];
+  if (!confirm(`Voltar TODAS as teclas da camada ${lname} para o padrão de fábrica?`)) return;
+  guarded("Restaurando camada", async () => { await kb.resetLayer(layer); await loadLayer(layer); updateKeys(); showPicked(); });
+};
+drawCats(); drawCodes();
 
 // ---------- Iluminacao (teclas e barra de luz) ----------
 // Cada alvo tem seus efeitos, faixas e estado proprios; o painel mostra o alvo escolhido.
@@ -678,16 +799,22 @@ async function loadAll() {
   travel = (await step("curso", () => kb.getTravel(positions))) || {};
   rtv = (await step("rapid trigger", () => kb.getRT(positions))) || {};
   dz = (await step("zona morta", () => kb.getDeadZone(positions))) || {};
+  keymap = {}; await loadLayer(layer); picked = null; showPicked();
   setTab(tab); fillPerfControls();
   status("Pronto", "ok");
 }
 
 async function connect() {
-  if (!navigator.hid) { status("Este navegador não tem WebHID. Use Chrome ou Edge.", "err"); return; }
   try {
     if (liveMode) await stopLiveMode();
-    const dev = await AulaKeyboard.pick();
-    kb = new AulaKeyboard(dev, log);
+    if (kb) { await kb.transport.close(); kb = null; }
+    status("Procurando o teclado...");
+    const t = await openTransport();
+    t.onDisconnect(() => {
+      $("devst").textContent = "desconectado"; $("devst").className = "st";
+      status("O teclado foi desconectado. Ligue de novo e clique em Reconectar.", "err");
+    });
+    kb = new AulaKeyboard(t, log);
     const id = await kb.uuid();
     const [name, layoutName] = MODELS[id] || [`Desconhecido (${id})`, "ARM32_HID_68"];
     $("model").textContent = $("model2").textContent = name;
@@ -699,6 +826,7 @@ async function connect() {
     await loadAll();
   } catch (e) { status(e.message, "err"); }
 }
+if (window.__TAURI__) $("browserhint").remove();
 $("connect").onclick = connect; $("connect2").onclick = connect;
 $("reload").onclick = () => loadAll();
 </script>

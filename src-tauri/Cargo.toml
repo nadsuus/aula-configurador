@@ -1,0 +1,17 @@
+[package]
+name = "aula-configurador"
+version = "0.1.0"
+description = "Configurador para teclados Aula HERO"
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+hidapi = "2.6"
+
+[profile.release]
+strip = true
+lto = true

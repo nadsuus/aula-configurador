@@ -1,5 +1,5 @@
 // Protocolo dos teclados Aula HERO ("kb_by_v3_wired"), reconstruido a partir do
-// JavaScript publico de hero.aulastar.com. Fala com o teclado via WebHID.
+// JavaScript publico de hero.aulastar.com. Fala com o teclado por um transporte (transport.js).
 //
 // Formato de todo pacote (63 bytes, report ID 9):
 //   [0] comando   [1] subcomando/perfil   [2] 0
@@ -71,17 +71,16 @@ const chunk = (arr, n) => { const o = []; for (let i = 0; i < arr.length; i += n
 const pos16 = (p) => [(p >> 8) & 0xff, p & 0xff];
 
 class AulaKeyboard {
-  constructor(device, log = () => {}) {
-    this.device = device;
+  // transport: ver transport.js (WebHID no navegador, Rust/hidapi no app)
+  constructor(transport, log = () => {}) {
+    this.transport = transport;
     this.log = log;
     this.waiter = null;      // { match(pkt) -> bool, resolve }
     this.queue = Promise.resolve(); // fila: um comando por vez, sem travas aninhadas
     this.precision = 10;     // micrometros por unidade (lido do teclado)
     this.onLive = null;      // (lista de {pos, mm, pressed}) durante o modo "ao vivo"
     this.onCalibrate = null; // (lista de {pos, cur, finished}) durante a calibracao
-    device.addEventListener("inputreport", (e) => {
-      if (e.reportId !== REPORT_ID) return;
-      const pkt = Array.from(new Uint8Array(e.data.buffer, e.data.byteOffset, e.data.byteLength));
+    transport.onReport((pkt) => {
       this.stream(pkt);
       if (this.waiter && this.waiter.match(pkt)) {
         const w = this.waiter; this.waiter = null;
@@ -89,16 +88,6 @@ class AulaKeyboard {
         w.resolve(pkt);
       }
     });
-  }
-
-  static async pick() {
-    const filters = PRODUCT_IDS.map((productId) => ({ vendorId: VENDOR_ID, productId }));
-    const devices = await navigator.hid.requestDevice({ filters });
-    // o teclado expoe varias interfaces HID; a de configuracao tem output report 9
-    const dev = devices.find((d) => d.collections.some((c) => c.outputReports.some((r) => r.reportId === REPORT_ID)));
-    if (!dev) throw new Error("Nenhuma interface de configuracao encontrada. Use o cabo USB.");
-    if (!dev.opened) await dev.open();
-    return dev;
   }
 
   build(head, data = []) {
@@ -119,7 +108,7 @@ class AulaKeyboard {
           this.waiter = { match: (r) => r[0] === expect && r[3] === packet[3] && r[4] === packet[4], resolve };
         });
         this.log("tx", hex(packet.slice(0, 24)));
-        await this.device.sendReport(REPORT_ID, new Uint8Array(packet));
+        await this.transport.send(packet);
         const res = await Promise.race([got, sleep(timeout).then(() => null)]);
         if (res) return res;
         this.waiter = null;
@@ -248,6 +237,35 @@ class AulaKeyboard {
     }
   }
 
+  // ---------- Funcao das teclas (aba Botao) ----------
+  // Camadas: 0 = normal, 1 = segurando Fn, 2 = segurando Fn1.
+  // Cada tecla: pos16 + codigo de 4 bytes (ver keycodes.js). Leitura 0x83, gravacao 0x03, 9 teclas por pacote.
+  // Se o 3o byte da resposta for 3, a tecla tem um macro (o ultimo byte e o numero do macro).
+  async getKeymap(layer, positions) {
+    const out = {};
+    for (const part of chunk(positions.flatMap(pos16), 18)) {
+      const d = this.data(await this.transact(this.build([0x83, layer, 0, 1, 0, part.length], part), 0x83, { timeout: 500 }));
+      for (let i = 0; i < part.length / 2; i++) {
+        const k = d.slice(i * 6, i * 6 + 6);
+        const pos = k[0] * 256 + k[1];
+        if (pos !== part[i * 2] * 256 + part[i * 2 + 1]) continue;
+        out[pos] = { value: ((k[2] << 24) | (k[3] << 16) | (k[4] << 8) | k[5]) >>> 0, macro: k[2] === 3 ? k[5] : null };
+      }
+    }
+    return out;
+  }
+  // keys: [{ pos, value }]
+  async setKeymap(layer, keys) {
+    const bytes = keys.flatMap(({ pos, value }) => [...pos16(pos), (value >>> 24) & 0xff, (value >>> 16) & 0xff, (value >>> 8) & 0xff, value & 0xff]);
+    for (const part of chunk(bytes, 54)) {
+      await this.transact(this.build([0x03, layer, 0, 1, 0, part.length], part), 0x03, { timeout: 500 });
+    }
+  }
+  // Volta a camada inteira para o padrao de fabrica (so as funcoes das teclas dessa camada).
+  async resetLayer(layer) {
+    await this.transact(this.build([0x11, layer, 0, 1, 0, 1, 1]), 0x11, { timeout: 1500, tries: 3 });
+  }
+
   // ---------- Zona morta ----------
   // Por tecla: zona morta de cima (evita toque acidental) e de baixo (evita a tecla "soltar" no fundo).
   // 8 bytes por tecla: pos16, cima16, baixo16 (em unidades de precisao), global, ligado.
@@ -306,7 +324,7 @@ class AulaKeyboard {
   // Diz ao teclado quais teclas acompanhar. O app oficial reenvia a cada 100 ms, sem esperar resposta.
   async liveWatch(positions) {
     const bytes = positions.slice(0, 28).flatMap(pos16);
-    await this.device.sendReport(REPORT_ID, new Uint8Array(this.build([0x98, 1, 0, 1, 0, bytes.length], bytes)));
+    await this.transport.send(this.build([0x98, 1, 0, 1, 0, bytes.length], bytes));
   }
   async liveStop() { await this.transact(this.build([0x98, 2, 0, 1, 0, 0, 0]), 0x98, { timeout: 300, tries: 2 }); }
 
