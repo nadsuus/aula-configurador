@@ -48,6 +48,7 @@ A tela segue o mesmo desenho do site oficial: perfis na lateral, abas em cima, t
 - **Teclas avançadas**: as funções são escolhidas numa grade por grupo, como no site; DKS, segurar/tocar (MT), liga-desliga (TGL), SOCD, profundidades (MPT)
   e ao soltar (END), conforme o teclado aceitar; até 40 por perfil
 - **Explicações nas telas**: cada tela mostra as opções disponíveis com a explicação do que fazem, sem precisar clicar para revelar.
+- **Perfis na barra lateral**: além dos 3 perfis do teclado, dá para criar perfis novos e usar os prontos de CS2 e Valorant. Eles guardam acionamento, Rapid Trigger, zona morta e taxa em Hz; ao voltar para um perfil do teclado, os ajustes dele voltam junto.
 - **Iluminação**: efeito, cor, multicolorido, brilho e velocidade, tanto da luz das teclas quanto da
   **barra de luz**. O desenho do teclado mostra uma prévia da luz configurada (cor, brilho, efeito) e
   reage quando você aperta as teclas de verdade (Gatilho, Ondas ao digitar...)

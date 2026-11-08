@@ -36,6 +36,17 @@
   .profiles { display: grid; gap: 8px; }
   .profiles button { text-align: left; padding: 12px; border-radius: 6px; border: 1px solid transparent; background: var(--side-2); color: var(--side-text); }
   .profiles button.active { background: #0c0d10; border-color: var(--accent); }
+  .profilegroup { display: grid; gap: 8px; }
+  #myprofiles:empty { display: none; }
+  .myrow { position: relative; }
+  .myrow > button:first-child { width: 100%; padding-right: 34px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .myrow .del { position: absolute; top: 0; right: 0; bottom: 0; padding: 0 12px; border: 0; background: none; color: var(--side-muted); text-align: center; }
+  .myrow .del.sure { color: #ff8a80; font-size: 11px; }
+  .addprofile { width: 100%; padding: 12px; border-radius: 6px; border: 1px solid transparent; background: var(--side-2); color: var(--side-muted); text-align: left; }
+  .addprofile:disabled { opacity: .55; cursor: default; }
+  .mycreate { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 4px; }
+  .mycreate input { min-width: 0; padding: 10px; border-radius: 6px; border: 1px solid var(--accent); background: var(--side-2); color: var(--side-text); font: inherit; }
+  .mycreate button { padding: 0 9px; border-radius: 6px; border: 0; background: var(--side-2); color: var(--side-text); }
   .side-foot { margin-top: auto; display: grid; gap: 8px; }
   .side-foot button { padding: 9px; border-radius: 6px; border: 0; background: var(--side-2); color: var(--side-text); }
   .side-foot label { color: var(--side-muted); display: flex; gap: 8px; align-items: center; font-size: 13px; }
@@ -296,11 +307,17 @@
       <div class="st">Firmware: <span id="fw">-</span></div>
     </div>
     <h2 class="side-title">Perfis</h2>
-    <div class="profiles" id="profiles">
-      <button data-p="0" disabled>Perfil 1</button>
-      <button data-p="1" disabled>Perfil 2</button>
-      <button data-p="2" disabled>Perfil 3</button>
+    <div class="profilegroup">
+      <div class="profiles" id="profiles">
+        <button data-p="0" disabled>Perfil 1</button>
+        <button data-p="1" disabled>Perfil 2</button>
+        <button data-p="2" disabled>Perfil 3</button>
+      </div>
+      <div class="profiles" id="myprofiles"></div>
+      <div id="mycreate"></div>
     </div>
+    <h2 class="side-title">Perfis prontos</h2>
+    <div class="profiles" id="readyprofiles"></div>
     <div class="side-foot">
       <span id="status">Desconectado</span>
       <button id="reload" disabled>Reler do teclado</button>
@@ -646,6 +663,7 @@ function drawKeyboard() {
 
 function updateKeys() {
   showLightPreview();
+  if (kb) markSideProfiles();
   const pickable = tab === "perf" && perfMode === "individual" && !liveMode;
   for (const [p, e] of Object.entries(keyEls)) {
     const pos = Number(p), t = travel[pos], r = rtv[pos], d = dz[pos];
@@ -769,6 +787,159 @@ function fillPerfControls() {
   if (d) { $("dzon").checked = d.on; $("dztop").value = d.top; $("dzbot").value = d.bottom; }
   showVals();
 }
+
+// ---- Perfis prontos por jogo: pontos de partida, com as teclas padrao de cada jogo ----
+// Valores: mediana dos guias e relatos pesquisados em 2026-11. Zona morta nao muda; SOCD fica de fora.
+// Rapid Trigger so em WASD: nas teclas de segurar (como E no defuse) ele pode soltar sem querer.
+const WASD = ["W", "A", "S", "D"];
+const PERF_PRESETS = {
+  cs2: { name: "CS2", groups: [
+    { label: "W A S D", keys: WASD, mm: 0.6, rt: 0.4 },
+    { label: "Ctrl esquerdo (agachar)", keys: ["L_Ctrl"], mm: 0.8 },
+    { label: "Shift esquerdo (andar devagar)", keys: ["L_Shift"], mm: 1 },
+    { label: "E (usar e desarmar)", keys: ["E"], mm: 1.5 },
+    { label: "Espaço (pular)", keys: ["Space"], mm: 1.5 },
+    { label: "Esc e Windows", keys: ["Esc", "L_WIN"], mm: 4 },
+    { label: "Demais teclas", mm: 1.5 },
+  ] },
+  valorant: { name: "Valorant", groups: [
+    { label: "W A S D", keys: WASD, mm: 0.3, rt: 0.3 },
+    { label: "Ctrl esquerdo (agachar)", keys: ["L_Ctrl"], mm: 0.8 },
+    { label: "Shift esquerdo (andar devagar)", keys: ["L_Shift"], mm: 1 },
+    { label: "Q E C (habilidades)", keys: ["Q", "E", "C"], mm: 1.5 },
+    { label: "X (ultimate)", keys: ["X"], mm: 2 },
+    { label: "Espaço (pular)", keys: ["Space"], mm: 2 },
+    { label: "Esc e Windows", keys: ["Esc", "L_WIN"], mm: 4 },
+    { label: "Demais teclas", mm: 1.5 },
+  ] },
+};
+// O teclado so guarda 3 perfis. CS2, Valorant e os perfis criados ocupam o perfil atual enquanto
+// estao selecionados; os ajustes originais dele ficam aqui e voltam quando ele e selecionado de novo.
+const PRESET_POLLING = 0; // 1000 Hz nos perfis prontos (valor gravado; ver POLLING)
+let curSlot = null, curPolling, profileBusy = false, creatingProfile = false, myProfiles = [], virtualBySlot = {};
+try { virtualBySlot = JSON.parse(localStorage.getItem("aula-virtual-profiles") || "{}"); } catch { virtualBySlot = {}; }
+const saveVirtual = () => { try { localStorage.setItem("aula-virtual-profiles", JSON.stringify(virtualBySlot)); } catch {} };
+try { myProfiles = JSON.parse(localStorage.getItem("aula-perf-profiles") || "[]"); } catch { myProfiles = []; }
+const saveMyProfiles = () => { try { localStorage.setItem("aula-perf-profiles", JSON.stringify(myProfiles)); } catch {} };
+const fmtMm = (v) => `${v.toFixed(2).replace(".", ",")} mm`;
+const copyOf = (x) => JSON.parse(JSON.stringify(x));
+const currentPerf = () => ({ travel: copyOf(travel), rtv: copyOf(rtv), dz: copyOf(dz), polling: curPolling });
+function presetData(preset) {
+  const data = { travel: {}, rtv: {}, polling: PRESET_POLLING }, rest = preset.groups.find((g) => !g.keys), group = new Map();
+  for (const pos of allPos()) group.set(pos, rest);
+  for (const g of preset.groups) for (const name of g.keys ?? []) {
+    const pos = layout.find((k) => k.n === name)?.p;
+    if (pos !== undefined) group.set(pos, g);
+  }
+  for (const [pos, g] of group) {
+    data.travel[pos] = { mm: Math.min(g.mm, maxTravelFor([pos])), global: 1 };
+    const cur = rtv[pos], press = g.rt ?? (cur?.press || 0.3);
+    data.rtv[pos] = { on: !!g.rt, press, release: g.rt ?? (cur?.release || press), global: 1 };
+  }
+  return data;
+}
+function markSideProfiles() {
+  const key = virtualBySlot[curSlot]?.key;
+  const mine = (i) => key === "mine:" + myProfiles[i].name, ready = (id) => key === "ready:" + id;
+  const shown = key && (Object.keys(PERF_PRESETS).some(ready) || myProfiles.some((_, i) => mine(i)));
+  document.querySelectorAll("#profiles button").forEach((b) => b.classList.toggle("active", !shown && Number(b.dataset.p) === curSlot));
+  document.querySelectorAll("#myprofiles [data-i]").forEach((b) => b.classList.toggle("active", mine(b.dataset.i)));
+  document.querySelectorAll("#readyprofiles [data-preset]").forEach((b) => b.classList.toggle("active", ready(b.dataset.preset)));
+}
+function drawSideProfiles() {
+  const list = $("myprofiles"); list.innerHTML = "";
+  myProfiles.forEach((m, i) => {
+    const row = document.createElement("div"); row.className = "myrow";
+    const b = document.createElement("button"); b.textContent = m.name; b.title = m.name; b.dataset.i = i; b.disabled = !kb;
+    b.onclick = () => applyProfile("mine:" + m.name, m.name, () => myProfiles.find((x) => x.name === m.name));
+    const del = document.createElement("button"); del.className = "del"; del.textContent = "×"; del.title = "Apagar perfil";
+    del.onclick = () => {
+      if (!del.classList.contains("sure")) { // apagar nao tem volta: pede um segundo clique
+        del.classList.add("sure"); del.textContent = "Apagar?";
+        setTimeout(() => { del.classList.remove("sure"); del.textContent = "×"; }, 2500);
+        return;
+      }
+      myProfiles.splice(i, 1); saveMyProfiles(); drawSideProfiles();
+    };
+    row.append(b, del); list.appendChild(row);
+  });
+  const box = $("mycreate"); box.innerHTML = "";
+  if (creatingProfile) {
+    box.className = "mycreate";
+    const inp = document.createElement("input"); inp.maxLength = 24; inp.placeholder = "Nome do perfil"; inp.value = `Meu perfil ${myProfiles.length + 1}`;
+    const ok = document.createElement("button"); ok.textContent = "Salvar";
+    const no = document.createElement("button"); no.textContent = "×"; no.title = "Cancelar";
+    ok.onclick = () => createMyProfile(inp.value);
+    no.onclick = () => { creatingProfile = false; drawSideProfiles(); };
+    inp.onkeydown = (e) => { if (e.key === "Enter") ok.onclick(); if (e.key === "Escape") no.onclick(); e.stopPropagation(); };
+    box.append(inp, ok, no); inp.focus(); inp.select();
+  } else {
+    box.className = "";
+    const add = document.createElement("button"); add.className = "addprofile"; add.id = "mynew"; add.textContent = "+ Adicionar perfil"; add.disabled = !kb;
+    add.onclick = () => { creatingProfile = true; drawSideProfiles(); };
+    box.appendChild(add);
+  }
+  $("readyprofiles").innerHTML = Object.entries(PERF_PRESETS).map(([id, p]) => {
+    return `<button data-preset="${id}" ${kb ? "" : "disabled"} title="${p.groups.map((g) => `${g.label}: ${fmtMm(g.mm)}${g.rt ? ", RT " + fmtMm(g.rt) : ""}`).join("\n")}\nTaxa de resposta: 1000 Hz">${p.name}</button>`;
+  }).join("");
+  document.querySelectorAll("#readyprofiles [data-preset]").forEach((b) => (b.onclick = () => applyProfile("ready:" + b.dataset.preset, PERF_PRESETS[b.dataset.preset].name, () => presetData(PERF_PRESETS[b.dataset.preset]))));
+  if (kb) markSideProfiles();
+}
+function createMyProfile(raw) {
+  const name = raw.trim();
+  if (!name || myProfiles.some((m) => m.name === name)) { status("Nome vazio ou repetido", "err"); return; }
+  myProfiles.push({ name, ...currentPerf() });
+  saveMyProfiles();
+  creatingProfile = false;
+  drawSideProfiles();
+  status(`Perfil ${name} criado com os ajustes atuais`, "ok");
+}
+async function writePerf(d) {
+  const known = new Set(allPos()), only = (o) => Object.entries(o).filter(([p]) => known.has(Number(p)));
+  await kb.setTravel(only(d.travel).map(([p, t]) => ({ pos: Number(p), mm: t.mm, global: t.global })));
+  await kb.setRT(only(d.rtv).map(([p, r]) => ({ pos: Number(p), on: r.on, press: r.press, release: r.release, global: r.global })));
+  if (d.dz) await kb.setDeadZone(only(d.dz).map(([p, z]) => ({ pos: Number(p), on: z.on, top: z.top, bottom: z.bottom, global: z.global })));
+  const pos = allPos();
+  travel = { ...travel, ...(await kb.getTravel(pos)) };
+  rtv = { ...rtv, ...(await kb.getRT(pos)) };
+  dz = { ...dz, ...(await kb.getDeadZone(pos)) };
+  if (d.polling !== undefined && d.polling !== curPolling) { // por ultimo: os outros ajustes ja foram gravados
+    await kb.setPolling(d.polling);
+    curPolling = d.polling;
+    $("polling").value = d.polling;
+  }
+}
+function runProfileWrite(label, fn) {
+  if (liveMode) { status("Pare o modo ao vivo antes de trocar os ajustes", "err"); return; }
+  if (profileBusy) return;
+  profileBusy = true;
+  guarded(label, async () => {
+    try { await fn(); } finally { profileBusy = false; drawSideProfiles(); updateKeys(); fillPerfControls(); }
+  });
+}
+// Perfil criado guarda o que foi ajustado nele; os prontos sempre voltam aos valores originais.
+function keepMyEdits() {
+  const key = virtualBySlot[curSlot]?.key;
+  const m = key?.startsWith("mine:") && myProfiles.find((x) => "mine:" + x.name === key);
+  if (m) { Object.assign(m, currentPerf()); saveMyProfiles(); }
+}
+function applyProfile(key, name, getData) {
+  runProfileWrite(`Selecionando ${name}`, async () => {
+    const backup = virtualBySlot[curSlot]?.backup ?? currentPerf();
+    keepMyEdits();
+    await writePerf(getData());
+    virtualBySlot[curSlot] = { key, backup };
+    saveVirtual();
+  });
+}
+async function leaveVirtualProfile() {
+  const v = virtualBySlot[curSlot]; if (!v) return;
+  keepMyEdits();
+  await writePerf(v.backup);
+  delete virtualBySlot[curSlot];
+  saveVirtual();
+}
+drawSideProfiles();
 
 // Grava assim que o controle e solto. Uma gravacao por vez; o que mudar durante ela entra na proxima.
 let saving = null, dirty = new Set();
@@ -1340,7 +1511,7 @@ const ADV_TYPES = {
   DKS: ["DKS", "Uma tecla faz até 4 ações em 4 pontos do curso: começo do aperto, fundo, subindo do fundo e solta.", "No começo do aperto mira; no fundo atira."],
   MT: ["Segurar / tocar (MT)", "Um toque rápido faz uma função e segurar faz outra.", "Caps Lock: o toque manda Esc; segurando vira Ctrl."],
   TGL: ["Liga-desliga (TGL)", "Um toque liga ou desliga o disparo contínuo; segurando, a tecla funciona normal.", "W continua apertado até o próximo toque, para andar sem segurar."],
-  SOCD: ["SOCD", "Liga duas teclas opostas e decide o que vale quando as duas estão apertadas.", "A e D: a última apertada vale."],
+  SOCD: ["SOCD", "Liga duas teclas opostas e decide o que vale quando as duas estão apertadas.", "A e D: a última apertada vale.", "Atenção: não use no CS2. Nos servidores oficiais, a Valve expulsa da partida quem usa esse tipo de automação."],
   MPT: ["Profundidades (MPT)", "Até 3 funções em 3 profundidades diferentes da mesma tecla.", "Leve manda 1, médio manda 2, fundo manda 3."],
   END: ["Ao soltar (END)", "Manda outra tecla no momento em que você solta.", "Solta o botão de mirar e recarrega."],
 };
@@ -1456,7 +1627,7 @@ function showAdvPanel() {
     : `Tecla <b></b>: ${adv[pos] ? "tem " + ADV_TYPES[adv[pos].type]?.[0] : "sem função avançada"}. Escolha o tipo e ajuste abaixo.`;
   if (pos !== null) $("advinfo").querySelector("b").textContent = keyNameOf(pos);
   $("advtypes").innerHTML = Object.entries(ADV_TYPES).filter(([t]) => advFeatures.has(t))
-    .map(([t, [name, desc, ex]]) => `<button data-t="${t}" class="${(advDraft?.type ?? advPendingType) === t ? "active" : ""}">${name}<small>${desc}<em>Exemplo: ${ex}</em></small></button>`).join("");
+    .map(([t, [name, desc, ex, warn]]) => `<button data-t="${t}" class="${(advDraft?.type ?? advPendingType) === t ? "active" : ""}">${name}<small>${desc}<em>Exemplo: ${ex}</em>${warn ? `<strong class="redwarn">${warn}</strong>` : ""}</small></button>`).join("");
   document.querySelectorAll("#advtypes button").forEach((b) => (b.onclick = () => {
     if (pos === null) { advPendingType = advPendingType === b.dataset.t ? null : b.dataset.t; showAdvPanel(); return; }
     advDraft = adv[pos]?.type === b.dataset.t ? JSON.parse(JSON.stringify(adv[pos])) : newDraft(b.dataset.t, pos);
@@ -1508,7 +1679,8 @@ function drawAdvEditor() {
       <label class="field"><span>Tecla 2</span><select class="in" id="sc2">${keyOpts}</select></label>
       </div>
       <div class="field"><span>Quando as duas estão apertadas</span><div class="optlist" id="scm">${SOCD_MODES.map(([v, t, h]) => `<button type="button" data-m="${v}" class="${d.mode === v ? "active" : ""}">${t}<small>${h}</small></button>`).join("")}</div></div>
-      <p class="note">Exemplo: A e D num jogo. Com "a última apertada vale", segurar A e apertar D faz andar para a direita. Cuidado no CS2: nos servidores oficiais, a Valve pode expulsar da partida quem usa esse tipo de automação.</p>`;
+      <p class="note">Exemplo: A e D num jogo. Com "a última apertada vale", segurar A e apertar D faz andar para a direita.</p>
+      <p class="redwarn">${ADV_TYPES.SOCD[3]}</p>`;
     $("sc1").value = d.keys[0]; $("sc2").value = d.keys[1] ?? d.keys[0];
     $("sc1").onchange = () => (d.keys[0] = Number($("sc1").value)); $("sc2").onchange = () => (d.keys[1] = Number($("sc2").value));
     ed.querySelectorAll("#scm button").forEach((b) => (b.onclick = () => { d.mode = Number(b.dataset.m); ed.querySelectorAll("#scm button").forEach((x) => x.classList.toggle("active", x === b)); }));
@@ -1720,17 +1892,24 @@ drawModes();
 // ---------- Dispositivo ----------
 function fill(sel, opts) { sel.innerHTML = opts.map(([v, t]) => `<option value="${v}">${t}</option>`).join(""); }
 fill($("polling"), POLLING); fill($("sleep"), SLEEP);
-$("polling").onchange = () => guarded("Taxa de resposta", () => kb.setPolling(Number($("polling").value)));
+$("polling").onchange = () => guarded("Taxa de resposta", async () => { const v = Number($("polling").value); await kb.setPolling(v); curPolling = v; });
 $("sleep").onchange = () => guarded("Suspensão", () => kb.setSleep(Number($("sleep").value)));
 $("mac").onchange = () => guarded("Modo Mac", () => kb.setMacMode($("mac").checked));
 $("winlock").onchange = () => guarded("Trava do Windows", () => kb.setWinLock($("winlock").checked));
 
 // ---------- Perfis ----------
-function showProfile(p) { document.querySelectorAll("#profiles button").forEach((b) => b.classList.toggle("active", Number(b.dataset.p) === p)); }
-document.querySelectorAll("#profiles button").forEach((b) => (b.onclick = () => guarded("Trocando perfil", async () => {
-  if (liveMode) await stopLiveMode();
-  await kb.setProfile(Number(b.dataset.p)); await loadAll();
-})));
+function showProfile(p) { curSlot = p; markSideProfiles(); }
+document.querySelectorAll("#profiles button").forEach((b) => (b.onclick = () => {
+  if (profileBusy) return;
+  profileBusy = true;
+  guarded("Trocando perfil", async () => {
+    try {
+      if (liveMode) await stopLiveMode();
+      await leaveVirtualProfile();
+      await kb.setProfile(Number(b.dataset.p)); await loadAll();
+    } finally { profileBusy = false; }
+  });
+}));
 
 // ---------- Leitura e conexao ----------
 async function loadAll() {
@@ -1745,13 +1924,14 @@ async function loadAll() {
   loadLightState("keys", await step("luz", () => kb.getLight()));
   loadLightState("side", await step("barra de luz", () => kb.getSideLight()));
   showLight();
-  const pol = await step("polling", () => kb.getPolling()); if (pol !== undefined) $("polling").value = pol;
+  const pol = await step("polling", () => kb.getPolling()); if (pol !== undefined) { $("polling").value = pol; curPolling = pol; }
   const slp = await step("suspensao", () => kb.getSleep()); if (slp !== undefined) $("sleep").value = slp;
   const mac = await step("mac", () => kb.getMacMode()); if (mac !== undefined) $("mac").checked = mac;
   const wl = await step("winlock", () => kb.getWinLock()); if (wl !== undefined) $("winlock").checked = wl;
 
   const positions = allPos();
   keyTypes = (await step("tipos de switch", () => kb.getKeyTypes(positions))) || {};
+  drawSideProfiles();
   travel = (await step("curso", () => kb.getTravel(positions))) || {};
   rtv = (await step("rapid trigger", () => kb.getRT(positions))) || {};
   dz = (await step("zona morta", () => kb.getDeadZone(positions))) || {};
