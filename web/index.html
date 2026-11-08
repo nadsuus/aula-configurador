@@ -524,7 +524,7 @@
           <div class="colorbox">
             <div class="paintbox hidden" id="paintbox">
               <b>Pintar as teclas</b>
-              <p class="note">Escolha a cor abaixo e clique nas teclas do desenho. Arraste para pintar várias. O botão direito do mouse apaga.</p>
+              <p class="note">Escolha a cor abaixo e clique nas teclas do desenho. Arraste para pintar várias. Clique de novo para desfazer. O botão direito do mouse apaga.</p>
               <div class="row"><button class="btn" id="paintall">Pintar todas</button><button class="btn" id="paintclear">Apagar todas</button></div>
             </div>
             <div class="cm notpaint" id="cmode"><button data-c="color" class="active">Cor única</button><button data-c="mix">Multicolorido</button></div>
@@ -1742,7 +1742,7 @@ function drawModes() {
 // Efeito Personalizado: cada tecla tem a sua cor, pintada no desenho.
 const CUSTOM_MODE = 19, NO_COLOR = "#000000";
 const paintMode = () => lightTarget === "keys" && LIGHT.keys.st.mode === CUSTOM_MODE;
-let customColors = {}, customLoaded = false, customTimer = null, paintButton = -1;
+let customColors = {}, customPrev = {}, customLoaded = false, customTimer = null, paintButton = -1, paintUndoing = false;
 const customDirty = new Set();
 async function loadCustomColors() {
   if (customLoaded || !Object.keys(keyEls).length) return;
@@ -1755,6 +1755,7 @@ async function loadCustomColors() {
 }
 function paintKey(pos, color) {
   if (customColors[pos] === color) return;
+  customPrev[pos] = customColors[pos];
   customColors[pos] = color;
   customDirty.add(pos);
   keyEls[pos].el.style.setProperty("--lc", color);
@@ -1769,16 +1770,23 @@ function sendPaint() {
   customDirty.clear();
   if (list.length) guarded(`Gravando cor de ${list.length} ${list.length === 1 ? "tecla" : "teclas"}`, () => kb.setKeyColors(list));
 }
-function paintFromEvent(e) {
+// Clicar numa tecla que ja esta com a cor escolhida desfaz; arrastar a partir dela desfaz as outras.
+function paintFromEvent(e, starting = false) {
+  if (starting) paintUndoing = false;
   const key = e.target.closest(".key");
-  if (key) paintKey(Number(key.dataset.p), paintButton === 2 ? NO_COLOR : LIGHT.keys.st.color);
+  if (!key) return;
+  const pos = Number(key.dataset.p), color = LIGHT.keys.st.color;
+  if (paintButton === 2) return paintKey(pos, NO_COLOR);
+  if (starting) paintUndoing = customColors[pos] === color;
+  if (!paintUndoing) paintKey(pos, color);
+  else if (customColors[pos] === color) paintKey(pos, customPrev[pos] ?? NO_COLOR);
 }
 const canPaint = () => tab === "light" && paintMode();
 $("kb").addEventListener("pointerdown", (e) => {
   if (!canPaint() || (e.button !== 0 && e.button !== 2)) return;
   e.preventDefault();
   paintButton = e.button;
-  paintFromEvent(e);
+  paintFromEvent(e, true);
 });
 $("kb").addEventListener("pointerover", (e) => {
   if (paintButton < 0 || !canPaint()) return;
@@ -1920,7 +1928,7 @@ async function loadAll() {
   await step("precisao", () => kb.loadPrecision());
   const prof = await step("perfil", () => kb.getProfile()); if (prof !== undefined) showProfile(prof);
 
-  customColors = {}; customLoaded = false; // cada perfil tem as suas cores por tecla
+  customColors = {}; customPrev = {}; customLoaded = false; // cada perfil tem as suas cores por tecla
   loadLightState("keys", await step("luz", () => kb.getLight()));
   loadLightState("side", await step("barra de luz", () => kb.getSideLight()));
   showLight();
