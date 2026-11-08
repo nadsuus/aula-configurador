@@ -51,7 +51,7 @@ A tela segue o mesmo desenho do site oficial: perfis na lateral, abas em cima, t
   **barra de luz**. O desenho do teclado mostra uma prévia da luz configurada (cor, brilho, efeito) e
   reage quando você aperta as teclas de verdade (Gatilho, Ondas ao digitar...)
 - **Desempenho**, para todas as teclas ou só as escolhidas (com atalhos Selecionar todas, WASD, Inverter):
-  - ponto de acionamento
+  - ponto de acionamento, com uma keycap 3D que afunda até o valor escolhido e uma régua em mm
   - Rapid Trigger, com sensibilidade de apertar e soltar
   - zona morta de cima e de baixo
   - **curso ao vivo**: mostra quanto cada tecla afundou e quando ela aciona
@@ -68,6 +68,8 @@ De propósito **não** mexe em firmware nem em reset de fábrica.
 - `web/transport.js`: como os pacotes chegam ao teclado (WebHID no navegador, Rust no app)
 - `web/layouts.js`: posição das teclas de cada modelo, extraída do app oficial
 - `web/keycodes.js`: códigos das funções de tecla, extraídos do app oficial
+- `web/keycap3d.js`: a keycap 3D da aba Desempenho
+- `web/vendor/`: cópia local do Three.js (licença MIT), usada pela keycap 3D
 - `src-tauri/src/main.rs`: a parte em Rust do app (USB pela biblioteca hidapi)
 
 ## Aviso

@@ -167,6 +167,10 @@
   .vslider { writing-mode: vertical-lr; height: 220px; width: 28px; accent-color: var(--accent); margin: 0; }
   .vslider.up { direction: rtl; }
   .bubble { align-self: center; background: var(--accent); color: #fff; border-radius: 4px; padding: 4px 8px; font-size: 12px; text-align: center; font-variant-numeric: tabular-nums; }
+  .kc3dbox { flex: 1; min-width: 0; display: grid; gap: 6px; align-content: center; }
+  .kc3dstage { position: relative; height: 300px; border-radius: 10px; overflow: hidden; background: radial-gradient(ellipse at 50% 40%, #1c2026, #131518 75%); }
+  #kc3d { position: absolute; inset: 0; }
+  #kcruler { position: absolute; top: 0; right: 0; width: 92px; height: 100%; }
   .bubble.red { background: var(--err); } .bubble.purple { background: var(--purple); }
   .dz { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: center; }
   .dz-row { display: flex; gap: 10px; align-items: center; justify-content: center; }
@@ -351,13 +355,25 @@
             <button class="btn blue" id="livebtn">Curso ao vivo</button>
           </div>
           <div class="travel">
-            <div class="ruler"><span>0.00</span><span>0.50</span><span>1.00</span><span>1.50</span><span>2.00</span><span>2.50</span><span>3.00</span><span>3.50</span><span>4.00</span></div>
             <div class="vcol">
               <button class="pm" data-for="travel" data-d="-0.01">−</button>
               <input type="range" class="vslider" id="travel" min="0" max="4" step="0.01">
               <button class="pm" data-for="travel" data-d="0.01">+</button>
             </div>
-            <div class="bubble">aciona em<br><b id="travel-v">-</b></div>
+            <div class="kc3dbox">
+              <div class="note" id="kc-cur"></div>
+              <div class="kc3dstage">
+                <div id="kc3d"></div>
+                <svg id="kcruler" viewBox="0 0 100 290" aria-label="Régua do curso da tecla">
+                  <g id="kc-ruler" font-size="11" fill="#aab2bd"></g>
+                  <rect id="kc-dzt" x="36" width="8" rx="2" fill="#ff6b5e" opacity=".7"/>
+                  <rect id="kc-dzb" x="36" width="8" rx="2" fill="#b197fc" opacity=".7"/>
+                  <g id="kc-rt"><line id="kc-rel" x1="30" x2="46" stroke="#74b0ff" stroke-width="3" stroke-linecap="round"/><text id="kc-relt" x="26" font-size="10" font-weight="600" fill="#74b0ff" text-anchor="end">solta</text></g>
+                  <line id="kc-act" x1="0" x2="50" stroke="#4fd6a6" stroke-width="2" stroke-dasharray="6 4"/>
+                  <g id="kc-pill"><rect x="50" width="46" height="20" rx="10" fill="#4fd6a6"/><text id="travel-v" x="73" font-size="11" font-weight="700" fill="#0d1512" text-anchor="middle"></text></g>
+                </svg>
+              </div>
+            </div>
           </div>
           <p class="note" id="travelmax"></p>
         </section>
@@ -539,6 +555,7 @@ function setTab(t) {
   if (t === "button" || t === "sc" || t === "light") startBtnLive(); else stopBtnLive();
   document.querySelectorAll("#tabs button").forEach((b) => b.classList.toggle("active", b.dataset.tab === t));
   $("tab-perf").classList.toggle("hidden", t !== "perf");
+  showKey3d(t === "perf");
   $("tab-light").classList.toggle("hidden", t !== "light");
   $("tab-button").classList.toggle("hidden", t !== "button");
   $("tab-adv").classList.toggle("hidden", t !== "adv");
@@ -641,8 +658,52 @@ function maxTravelFor(positions) {
   const vals = positions.map((p) => SWITCH_MAX[keyTypes[p]] ?? 3400);
   return (vals.length ? Math.min(...vals) : 3400) / 1000;
 }
+// Keycap 3D (keycap3d.js + Three.js local): afunda ate o ponto de acionamento, ou segue a tecla
+// real no curso ao vivo. A regua ao lado mostra os valores. So desenha com a aba Desempenho aberta.
+const KC_PX = 64, KC_Y0 = 16;
+let kcLive = null; // { pos, mm, pressed } durante o curso ao vivo
+let key3d = null, key3dLoading = false;
+function showKey3d(on) {
+  if (!on) { key3d?.pause(); return; }
+  if (key3d) { key3d.resume(); return; }
+  if (key3dLoading) return;
+  key3dLoading = true;
+  Promise.all([import("./vendor/three.module.js"), import("./keycap3d.js")])
+    .then(async ([THREE, { createKeycap }]) => {
+      key3d = await createKeycap($("kc3d"), { THREE, actuation: Number($("travel").value), offsetX: 46 });
+      drawKeycap();
+      if (tab !== "perf") key3d.pause();
+    })
+    .catch((e) => { log("!!", `keycap 3D: ${e.message}`); $("kc3d").innerHTML = `<p class="note" style="padding:12px;color:#aab2bd">Não foi possível mostrar a keycap 3D.</p>`; });
+}
+function drawKeycap() {
+  const max = maxTravelFor(targets().length ? targets() : allPos());
+  const act = Math.min(Number($("travel").value), max), gy = (d) => KC_Y0 + Math.min(Math.max(d, 0), max) * KC_PX;
+  if (key3d) {
+    key3d.setMaxTravel(max); key3d.setActuation(act);
+    if (kcLive) key3d.follow(kcLive.mm, kcLive.pressed); else key3d.unfollow();
+  }
+  // regua: risco a cada 0.5 mm, numero a cada 1 mm
+  if ($("kc-ruler").dataset.max !== String(max)) {
+    $("kc-ruler").dataset.max = String(max);
+    let h = `<line x1="40" x2="40" y1="${gy(0)}" y2="${gy(max)}" stroke="#5a616c" stroke-width="2"/>`;
+    for (let d = 0; d <= max + 1e-6; d += 0.5)
+      h += `<line x1="40" x2="${d % 1 ? 46 : 50}" y1="${gy(d)}" y2="${gy(d)}" stroke="#7d848e"/>` + (d % 1 ? "" : `<text x="56" y="${gy(d) + 4}">${d} mm</text>`);
+    $("kc-ruler").innerHTML = h;
+  }
+  $("kc-act").setAttribute("y1", gy(act)); $("kc-act").setAttribute("y2", gy(act));
+  $("kc-pill").querySelector("rect").setAttribute("y", gy(act) - 10); $("travel-v").setAttribute("y", gy(act) + 4);
+  const dzOn = $("dzon").checked, top = dzOn ? Number($("dztop").value) : 0, bot = dzOn ? Number($("dzbot").value) : 0;
+  $("kc-dzt").setAttribute("y", gy(0)); $("kc-dzt").setAttribute("height", top * KC_PX);
+  $("kc-dzb").setAttribute("y", gy(max - bot)); $("kc-dzb").setAttribute("height", bot * KC_PX);
+  const rel = act - Number($("split").checked ? $("release").value : $("press").value);
+  $("kc-rt").style.display = $("rt").checked && rel > 0.05 ? "" : "none";
+  $("kc-rel").setAttribute("y1", gy(rel)); $("kc-rel").setAttribute("y2", gy(rel)); $("kc-relt").setAttribute("y", gy(rel) + 3);
+  $("kc-cur").textContent = kcLive ? `Ao vivo: ${kcLive.mm.toFixed(2)} mm${kcLive.pressed ? " · acionou" : ""}` : `Aciona em ${act.toFixed(2)} mm (de ${max.toFixed(1)} mm)`;
+}
 function showVals() {
-  $("travel-v").textContent = mm($("travel").value);
+  drawKeycap();
+  $("travel-v").textContent = Number($("travel").value).toFixed(2);
   for (const id of ["press", "release"]) $(id + "-v").textContent = mm($(id).value);
   $("dztop-v").textContent = mm($("dztop").value); $("dzbot-v").textContent = mm($("dzbot").value);
   $("rtbody").style.opacity = $("rt").checked ? 1 : 0.45;
@@ -727,6 +788,7 @@ function onLive(keys) {
     e.fill.style.height = `${Math.min(1, k.mm / keyMax(k.pos)) * 100}%`;
     e.el.classList.toggle("on", k.pressed);
     e.i.textContent = k.mm > 0.005 ? k.mm.toFixed(2) : "";
+    if (k.mm > 0.005 || (kcLive && kcLive.pos === k.pos)) { kcLive = { pos: k.pos, mm: k.mm, pressed: k.pressed }; drawKeycap(); }
     if (k.mm > 0.005) {
       recent.set(k.pos, now);
       const t = travel[k.pos];
@@ -757,11 +819,11 @@ function enterMode(mode) {
 }
 async function stopLiveMode() {
   clearInterval(liveTimer); liveTimer = null;
-  const mode = liveMode; liveMode = null;
+  const mode = liveMode; liveMode = null; kcLive = null;
   if (kb) { kb.onLive = null; kb.onCalibrate = null; }
   $("banner").classList.add("hidden"); $("caltips").classList.add("hidden");
   $("calbtn").disabled = false; $("livebtn").disabled = false;
-  setTab(tab);
+  setTab(tab); drawKeycap();
   if (mode === "live") await kb.liveStop().catch((e) => log("!!", e.message));
   if (mode === "cal") await kb.calibrationStop();
 }
