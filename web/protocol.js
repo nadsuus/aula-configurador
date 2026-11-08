@@ -176,6 +176,25 @@ class AulaKeyboard {
     await this.transact(this.build([0x04, 6, 0, 1, 0, rainbow ? 4 : 7], [mode, rainbow ? 7 : 0, r, g, b, bright, speed]), 0x04);
   }
 
+  // ---------- Cores por tecla (efeito Personalizado, modo 19) ----------
+  // Cada tecla ocupa 5 bytes (posicao 16 bits, R, G, B); cabem 11 teclas por pacote.
+  async getKeyColors(positions) {
+    const out = {};
+    for (const part of chunk(positions.flatMap(pos16), 22)) {
+      const d = this.data(await this.transact(this.build([0x86, 0, 0, 1, 0, part.length], part), 0x86));
+      for (let i = 0; i < part.length / 2; i++) {
+        const o = i * 5;
+        out[d[o] * 256 + d[o + 1]] = { r: d[o + 2], g: d[o + 3], b: d[o + 4] };
+      }
+    }
+    return out;
+  }
+  async setKeyColors(list) { // [{ pos, r, g, b }]
+    const parts = chunk(list.flatMap(({ pos, r, g, b }) => [...pos16(pos), r, g, b]), 55);
+    for (let i = 0; i < parts.length; i++)
+      await this.transact(this.build([0x06, 0, 0, parts.length, i, parts[i].length], parts[i]), 0x06, { timeout: 1000, tries: 2 });
+  }
+
   // ---------- Switches magneticos: tipo, curso e Rapid Trigger ----------
   async getKeyTypes(positions) {
     const out = {};

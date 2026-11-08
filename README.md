@@ -50,6 +50,7 @@ A tela segue o mesmo desenho do site oficial: perfis na lateral, abas em cima, t
 - **Iluminação**: efeito, cor, multicolorido, brilho e velocidade, tanto da luz das teclas quanto da
   **barra de luz**. O desenho do teclado mostra uma prévia da luz configurada (cor, brilho, efeito) e
   reage quando você aperta as teclas de verdade (Gatilho, Ondas ao digitar...)
+  No efeito Personalizado, cada tecla tem a sua cor: é só pintar no desenho, clicando ou arrastando.
 - **Desempenho**, para todas as teclas ou só as escolhidas (com atalhos Selecionar todas, WASD, Inverter):
   - ponto de acionamento, com uma keycap 3D que afunda até o valor escolhido e uma régua em mm
   - Rapid Trigger, com sensibilidade de apertar e soltar
