@@ -125,6 +125,18 @@
   .seg button { border: 0; padding: 7px 16px; background: var(--card); color: var(--accent); font-size: 13px; }
   .seg button.active { background: var(--accent); color: #fff; }
   .seg-wrap { text-align: center; }
+  .help { display: grid; gap: 4px; background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 9px 11px; margin-bottom: 12px; color: var(--muted); font-size: 12px; line-height: 1.45; }
+  .help p { margin: 0; }
+  .help b { color: var(--text); font-weight: 600; }
+  .seghelp { max-width: 640px; margin: 8px auto 0; }
+  .seghelp b { color: var(--text); font-weight: 600; }
+  .dcard > div small { display: block; color: var(--muted); font-size: 11px; line-height: 1.35; margin-top: 2px; }
+  #cats { flex-wrap: wrap; overflow-x: visible; }
+  #cats button small { display: block; font-size: 11px; font-weight: 400; color: var(--muted); line-height: 1.25; margin-top: 2px; }
+  .optlist { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px; }
+  .optlist button { padding: 9px 11px; border-radius: 6px; border: 1px solid var(--line); background: var(--card); color: var(--text); text-align: left; }
+  .optlist button small { display: block; color: var(--muted); font-size: 11px; }
+  .optlist button.active { border-color: var(--key-sel); box-shadow: 0 0 0 1px var(--key-sel); }
   .legend { text-align: center; color: var(--muted); font-size: 12px; margin-top: 10px; }
   .legend .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--purple); margin-right: 4px; }
   .banner { display: flex; gap: 12px; align-items: center; justify-content: center; flex-wrap: wrap; margin-top: 14px; }
@@ -216,9 +228,11 @@
 
   /* Teclas avancadas */
   .advpanel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 18px 20px; }
-  .types { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+  .types { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 8px; margin: 12px 0; }
   .types button { padding: 10px 14px; border-radius: 6px; border: 1px solid var(--line); background: var(--card); color: var(--text); text-align: left; }
-  .types button small { display: block; color: var(--muted); font-size: 11px; max-width: 220px; }
+  .types button { font-weight: 600; }
+  .types button small { display: block; color: var(--muted); font-size: 12px; font-weight: 400; margin-top: 3px; line-height: 1.35; }
+  .types button small em { display: block; font-style: normal; margin-top: 3px; }
   .types button.active { border-color: var(--key-sel); box-shadow: 0 0 0 1px var(--key-sel); }
   .adved { display: grid; gap: 12px; background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 14px; margin-bottom: 12px; }
   .adved .grid4 { display: grid; grid-template-columns: 180px repeat(4, minmax(0, 1fr)); gap: 6px; align-items: center; }
@@ -331,6 +345,7 @@
             <label><input type="radio" name="layer" value="1"> Segurando Fn</label>
             <label><input type="radio" name="layer" value="2"> Segurando Fn1</label>
             <button id="layerreset">Restaurar camada</button>
+            <p class="note">Cada camada guarda funções próprias. Marque uma para ver e trocar o que as teclas fazem nela.</p>
           </div>
         </div>
         <div class="note lightnote hidden" id="lightnote"></div>
@@ -339,6 +354,7 @@
         </div>
         <div class="seg-wrap" id="perfseg">
           <div class="seg"><button data-m="global" class="active">Todas as teclas</button><button data-m="individual">Teclas individuais</button></div>
+          <p class="note seghelp"><b>Todas as teclas:</b> cada ajuste vale para o teclado inteiro. <b>Teclas individuais:</b> clique nas teclas do desenho e ajuste só elas, como deixar WASD mais sensível para jogar.</p>
           <div class="legend">Número na tecla: ponto de acionamento em mm · <span class="dot"></span>Rapid Trigger ligado</div>
         </div>
         <div class="banner hidden" id="banner">
@@ -353,11 +369,16 @@
       <div class="panels" id="tab-perf">
         <section>
           <div class="ph"><div><h3>Ponto de acionamento</h3><p>Quanto a tecla precisa afundar para contar.</p></div></div>
+          <div class="help">
+            <p><b>Valor baixo:</b> responde mais rápido, bom para jogar, mas pega toques sem querer.</p>
+            <p><b>Valor alto:</b> mais seguro para digitar. Exemplo: WASD em 0,3 mm e Esc em 3 mm.</p>
+          </div>
           <div class="note" id="target">Vale para todas as teclas</div>
           <div class="row" style="margin-top:10px">
             <button class="btn purple" id="calbtn">Calibrar teclas</button>
             <button class="btn blue" id="livebtn">Curso ao vivo</button>
           </div>
+          <p class="note"><b>Calibrar:</b> ensina ao teclado o curso real de cada tecla; use se alguma acionar fora do ponto. <b>Curso ao vivo:</b> mostra quanto cada tecla afundou, para testar os ajustes.</p>
           <div class="travel">
             <div class="vcol">
               <button class="pm" data-for="travel" data-d="-0.01">−</button>
@@ -384,6 +405,11 @@
         <section>
           <div class="ph"><div><h3>Rapid Trigger (RT)</h3><p>A tecla solta e aciona de novo assim que muda de direção.</p></div>
             <label class="sw" title="Ligar ou desligar"><input type="checkbox" id="rt"><span></span></label></div>
+          <div class="help">
+            <p><b>Desligado:</b> a tecla só volta a valer depois de subir até um ponto fixo.</p>
+            <p><b>Ligado:</b> basta subir um pouquinho para soltar e descer um pouquinho para acionar de novo. Ajuda a repetir toques e a parar o movimento mais rápido nos jogos.</p>
+            <p>Evite menos de 0,04 mm: o tremor do dedo pode contar como soltar.</p>
+          </div>
           <div id="rtbody">
             <p class="note">Sensibilidade: quanto a tecla precisa se mover para acionar de novo (ao apertar) ou soltar (ao subir).</p>
             <div>Sensibilidade ao apertar</div>
@@ -399,6 +425,11 @@
         <section>
           <div class="ph"><div><h3>Zona morta</h3><p>Em cima evita toque acidental; embaixo evita a tecla soltar sozinha no fundo.</p></div>
             <label class="sw" title="Ligar ou desligar"><input type="checkbox" id="dzon"><span></span></label></div>
+          <div class="help">
+            <p><b>Em cima:</b> o começo do curso não conta, para a tecla não acionar com um toque de leve.</p>
+            <p><b>Embaixo:</b> tremidas no fundo da tecla não contam, para ela não soltar sozinha enquanto você segura.</p>
+            <p>Com zona morta 0, um leve tremor do dedo pode contar como soltar.</p>
+          </div>
           <div class="dz" id="dzbody">
             <div class="vcol"><div>Em cima</div>
               <button class="pm" data-for="dztop" data-d="-0.01">−</button>
@@ -499,10 +530,10 @@
           <div class="dcard"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 3h6v2h3a1 1 0 0 1 1 1v3h2v6h-2v3a1 1 0 0 1-1 1h-3v2H9v-2H6a1 1 0 0 1-1-1v-3H3V9h2V6a1 1 0 0 1 1-1h3z"/></svg><span>Firmware</span><b id="fw2">-</b></div>
         </div>
         <div class="dcol">
-          <div class="dcard"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 2h2v10h-2zm6.6 3.4 1.4 1.4A8 8 0 1 1 5 6.8l1.4-1.4A6 6 0 1 0 17.6 5.4z"/></svg><span>Taxa de resposta</span><select id="polling"></select></div>
-          <div class="dcard"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5l8-1v8H3zm10-1.2L21 3v9h-8zM3 13h8v8l-8-1zm10 0h8v8l-8-1.2z"/></svg><span>Travar tecla Windows</span><label class="sw"><input type="checkbox" id="winlock"><span></span></label></div>
-          <div class="dcard"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 12.6c0-2.5 2-3.6 2.1-3.7a4.6 4.6 0 0 0-3.6-2c-1.5-.2-3 .9-3.7.9s-2-.9-3.2-.8A4.8 4.8 0 0 0 4 9.4c-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3 2.4 1.2 0 1.700-.8 3.100-.8s1.900.8 3.200.8 2.100-1.200 2.900-2.400a10 10 0 0 0 1.300-2.700 4.200 4.200 0 0 1-2.300-3.900zM14 5.2A4.3 4.3 0 0 0 15 2a4.4 4.4 0 0 0-2.900 1.500 4.100 4.100 0 0 0-1 3.100A3.600 3.600 0 0 0 14 5.200z"/></svg><span>Modo Mac</span><label class="sw"><input type="checkbox" id="mac"><span></span></label></div>
-          <div class="dcard"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg><span>Suspender após</span><select id="sleep"></select></div>
+          <div class="dcard"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 2h2v10h-2zm6.6 3.4 1.4 1.4A8 8 0 1 1 5 6.8l1.4-1.4A6 6 0 1 0 17.6 5.4z"/></svg><div><span>Taxa de resposta</span><small>Quantas vezes por segundo o teclado avisa o computador. Mais Hz, menos atraso.</small></div><select id="polling"></select></div>
+          <div class="dcard"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5l8-1v8H3zm10-1.2L21 3v9h-8zM3 13h8v8l-8-1zm10 0h8v8l-8-1.2z"/></svg><div><span>Travar tecla Windows</span><small>Desliga a tecla Win para ela não tirar você do jogo.</small></div><label class="sw"><input type="checkbox" id="winlock"><span></span></label></div>
+          <div class="dcard"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 12.6c0-2.5 2-3.6 2.1-3.7a4.6 4.6 0 0 0-3.6-2c-1.5-.2-3 .9-3.7.9s-2-.9-3.2-.8A4.8 4.8 0 0 0 4 9.4c-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3 2.4 1.2 0 1.700-.8 3.100-.8s1.900.8 3.200.8 2.100-1.200 2.900-2.400a10 10 0 0 0 1.300-2.700 4.200 4.200 0 0 1-2.300-3.900zM14 5.2A4.3 4.3 0 0 0 15 2a4.4 4.4 0 0 0-2.900 1.500 4.100 4.100 0 0 0-1 3.100A3.600 3.600 0 0 0 14 5.200z"/></svg><div><span>Modo Mac</span><small>Faz o teclado seguir o padrão de teclas do Mac.</small></div><label class="sw"><input type="checkbox" id="mac"><span></span></label></div>
+          <div class="dcard"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg><div><span>Suspender após</span><small>Tempo sem uso até o teclado entrar em repouso.</small></div><select id="sleep"></select></div>
         </div>
       </div>
     </div>
@@ -518,9 +549,7 @@
         <p class="note" style="margin-top:14px">O teclado não devolve as macros, então a lista fica guardada neste computador. Para usar uma macro, vá na aba Botão → categoria Macros e escolha a tecla.</p>
         <button class="btn" id="msend" style="width:100%">Enviar todas para o teclado</button>
       </section>
-      <section id="meditor">
-        <div class="empty">Crie ou escolha uma macro à esquerda.</div>
-      </section>
+      <section id="meditor"></section>
     </div>
 
     <pre id="log" class="hidden"></pre>
@@ -580,7 +609,7 @@ function setTab(t) {
   $("perfseg").classList.toggle("hidden", t !== "perf" || !!liveMode);
   $("lightseg").classList.toggle("hidden", t !== "light");
   $("lightnote").classList.toggle("hidden", t !== "light");
-  $("selbtns").classList.toggle("hidden", !(t === "perf" && perfMode === "individual" && !liveMode));
+  $("selbtns").classList.toggle("hidden", !(t === "perf" && !liveMode));
   drawKeyboard();
 }
 document.querySelectorAll("#tabs button").forEach((b) => (b.onclick = () => setTab(b.dataset.tab)));
@@ -646,19 +675,23 @@ function onKeyClick(pos) {
 }
 const allPos = () => layout.map((k) => k.p);
 const drawnPos = () => Object.keys(keyEls).map(Number);
-$("selall").onclick = () => { drawnPos().forEach((p) => selected.add(p)); updateKeys(); fillPerfControls(); };
-$("selnone").onclick = () => { selected.clear(); updateKeys(); fillPerfControls(); };
-$("selinv").onclick = () => { drawnPos().forEach((p) => (selected.has(p) ? selected.delete(p) : selected.add(p))); updateKeys(); fillPerfControls(); };
+// Os atalhos de selecao aparecem sempre; usar um deles ja passa para "Teclas individuais".
+const individual = () => { if (perfMode !== "individual") setPerfMode("individual"); };
+$("selall").onclick = () => { individual(); drawnPos().forEach((p) => selected.add(p)); updateKeys(); fillPerfControls(); };
+$("selnone").onclick = () => { individual(); selected.clear(); updateKeys(); fillPerfControls(); };
+$("selinv").onclick = () => { individual(); drawnPos().forEach((p) => (selected.has(p) ? selected.delete(p) : selected.add(p))); updateKeys(); fillPerfControls(); };
 $("selwasd").onclick = () => {
+  individual();
   selected.clear();
   for (const k of layout) if (["W", "A", "S", "D"].includes(k.n) && keyEls[k.p]) selected.add(k.p);
   updateKeys(); fillPerfControls();
 };
-document.querySelectorAll("#perfseg .seg button").forEach((b) => (b.onclick = () => {
-  perfMode = b.dataset.m;
-  document.querySelectorAll("#perfseg .seg button").forEach((x) => x.classList.toggle("active", x === b));
+function setPerfMode(m) {
+  perfMode = m;
+  document.querySelectorAll("#perfseg .seg button").forEach((x) => x.classList.toggle("active", x.dataset.m === m));
   setTab("perf"); fillPerfControls();
-}));
+}
+document.querySelectorAll("#perfseg .seg button").forEach((b) => (b.onclick = () => setPerfMode(b.dataset.m)));
 let resizeT = null;
 window.addEventListener("resize", () => { clearTimeout(resizeT); resizeT = setTimeout(() => { if (!liveMode) drawKeyboard(); }, 150); });
 
@@ -1023,9 +1056,14 @@ function showKeyFunction(pos, e) {
   e.i.textContent = changed ? describe(keymap[layer][pos]) : "";
   e.el.title = `${e.n}: ${describe(keymap[layer]?.[pos])}`;
 }
+const CAT_HELP = {
+  basic_key: "Letras, números e Fn", mouse: "Cliques e desativar tecla", edit: "Copiar, colar, salvar", navigation: "Voltar e avançar",
+  windows: "Atalhos com a tecla Win", efficiency: "Alt+Tab, fechar programa", system_edit: "Recortar, copiar, colar", system_multimedia: "Música e volume",
+  system_tools: "Abrir apps, modo Mac", system_action: "Bloquear, zoom, brilho", macros: "Sequências que você criou",
+};
 function drawCats() {
-  const cs = KEYCODES.map((c) => `<button data-c="${c.id}">${c.name}</button>`);
-  $("cats").innerHTML = cs.join("") + `<button data-c="macros">Macros</button>`;
+  const cs = KEYCODES.map((c) => `<button data-c="${c.id}">${c.name}<small>${CAT_HELP[c.id] ?? ""}</small></button>`);
+  $("cats").innerHTML = cs.join("") + `<button data-c="macros">Macros<small>${CAT_HELP.macros}</small></button>`;
   document.querySelectorAll("#cats button").forEach((b) => (b.onclick = () => { cat = b.dataset.c; drawCodes(); }));
 }
 function drawCodes() {
@@ -1190,6 +1228,12 @@ for (const ev of ["keydown", "keyup"]) window.addEventListener(ev, (e) => {
 // macros = [{ name, mode, count, steps: [{ code, up, delay }] }], guardadas no navegador/app.
 const MACRO_MODES = [[1, "Repetir N vezes"], [2, "Enquanto segurar a tecla"], [4, "Modo repetir"]];
 const MAX_STEPS = 150;
+const MACRO_EMPTY = `<div class="help">
+  <p><b>O que é:</b> uma macro faz uma tecla digitar uma sequência inteira de teclas, com as esperas entre elas.</p>
+  <p><b>Como rodar:</b> ${MACRO_MODES.map(([, t]) => t).join(", ")}.</p>
+  <p><b>Como usar:</b> crie uma macro à esquerda, grave ou monte os passos e aplique em uma tecla na aba Botão, categoria Macros. Cada macro aceita até ${MAX_STEPS} passos.</p>
+</div>`;
+$("meditor").innerHTML = MACRO_EMPTY;
 let macros = [], mSel = null, recording = false, recLast = 0, macrosSent = true;
 try { macros = JSON.parse(localStorage.getItem("aula-macros") || "[]"); } catch { macros = []; }
 function saveMacros() { try { localStorage.setItem("aula-macros", JSON.stringify(macros)); } catch {} macrosSent = false; showMacroList(); }
@@ -1212,7 +1256,7 @@ $("msend").onclick = () => guarded("Enviando macros", async () => { await kb.set
 const addKeyOptions = () => Object.keys(MACRO_KEYS).map((c) => `<option value="${c}">${macroKeyName(c)}</option>`).join("");
 function showMacroEditor() {
   const m = macros[mSel];
-  if (!m) { $("meditor").innerHTML = `<div class="empty">Crie ou escolha uma macro à esquerda.</div>`; return; }
+  if (!m) { $("meditor").innerHTML = MACRO_EMPTY; return; }
   $("meditor").innerHTML = `
     <div class="row">
       <label class="field"><span>Nome</span><input type="text" id="mname"></label>
@@ -1293,14 +1337,19 @@ showMacroList();
 // ---------- Teclas avancadas ----------
 // adv[pos] = configuracao lida do teclado (camada normal). O teclado aceita ate 40 por perfil.
 const ADV_TYPES = {
-  DKS: ["DKS", "Até 4 ações em 4 pontos do curso (começo, fundo, subindo, solta)"],
-  MT: ["Segurar / tocar (MT)", "Um toque faz uma coisa, segurar faz outra"],
-  TGL: ["Liga-desliga (TGL)", "Um toque deixa a tecla presa; outro toque solta"],
-  SOCD: ["SOCD", "Duas teclas opostas: escolhe qual vale quando as duas estão apertadas"],
-  MPT: ["Profundidades (MPT)", "Até 3 funções em 3 profundidades diferentes"],
-  END: ["Ao soltar (END)", "Manda outra tecla quando você solta"],
+  DKS: ["DKS", "Uma tecla faz até 4 ações em 4 pontos do curso: começo do aperto, fundo, subindo do fundo e solta.", "No começo do aperto mira; no fundo atira."],
+  MT: ["Segurar / tocar (MT)", "Um toque rápido faz uma função e segurar faz outra.", "Caps Lock: o toque manda Esc; segurando vira Ctrl."],
+  TGL: ["Liga-desliga (TGL)", "Um toque liga ou desliga o disparo contínuo; segurando, a tecla funciona normal.", "W continua apertado até o próximo toque, para andar sem segurar."],
+  SOCD: ["SOCD", "Liga duas teclas opostas e decide o que vale quando as duas estão apertadas.", "A e D: a última apertada vale."],
+  MPT: ["Profundidades (MPT)", "Até 3 funções em 3 profundidades diferentes da mesma tecla.", "Leve manda 1, médio manda 2, fundo manda 3."],
+  END: ["Ao soltar (END)", "Manda outra tecla no momento em que você solta.", "Solta o botão de mirar e recarrega."],
 };
-const SOCD_MODES = [[1, "A última apertada vale"], [3, "Tecla 1 sempre vale"], [4, "Tecla 2 sempre vale"], [0, "Nenhuma vale (se anulam)"]];
+const SOCD_MODES = [
+  [1, "A última apertada vale", "A tecla apertada por último solta a anterior."],
+  [3, "Tecla 1 sempre vale", "Com as duas apertadas, só a Tecla 1 conta."],
+  [4, "Tecla 2 sempre vale", "Com as duas apertadas, só a Tecla 2 conta."],
+  [0, "Nenhuma vale (se anulam)", "Com as duas apertadas, nenhuma conta."],
+];
 const DKS_STAGES = ["Começo do aperto", "No fundo", "Subindo do fundo", "Soltou totalmente"];
 // opcoes por etapa (valores da tela do app oficial) e a conversao para os bytes do teclado
 const DKS_OPTS = [
@@ -1325,7 +1374,7 @@ function dksFromRaw(s) {
   if (s[0] === 10) n[0] = 1; if (s[0] === 14) n[0] = 4; if (s[0] === 6 && s[1] === 12) n[0] = 8; if (s[0] === 6 && s[1] === 4 && s[2] === 12) n[0] = 12;
   return n;
 }
-let adv = {}, advFeatures = new Set(Object.keys(ADV_TYPES)), advPicked = null, advDraft = null;
+let adv = {}, advFeatures = new Set(Object.keys(ADV_TYPES)), advPicked = null, advDraft = null, advPendingType = null;
 async function loadAdvanced() {
   const f = await step("tipos de tecla avançada", () => kb.getAdvancedFeatures());
   if (f && f.size) advFeatures = f;
@@ -1383,7 +1432,8 @@ function drawAdvPick() {
 function pickAdv(pos) {
   advPicked = advPicked === pos ? null : pos;
   const a = advPicked !== null ? adv[advPicked] : null;
-  advDraft = a ? JSON.parse(JSON.stringify(a)) : null;
+  advDraft = a ? JSON.parse(JSON.stringify(a)) : advPicked !== null && advPendingType ? newDraft(advPendingType, advPicked) : null;
+  if (advPicked !== null) advPendingType = null;
   updateKeys(); showAdvPanel();
 }
 function newDraft(type, pos) {
@@ -1401,12 +1451,14 @@ function showAdvPanel() {
   const n = Object.keys(adv).length;
   $("advcount").textContent = `${n} de 40 em uso`;
   const pos = advPicked;
-  $("advinfo").innerHTML = pos === null ? "Clique numa tecla do desenho para dar uma função avançada a ela."
+  $("advinfo").innerHTML = pos === null
+    ? (advPendingType ? `Agora clique na tecla do desenho que vai usar <b>${ADV_TYPES[advPendingType][0]}</b>.` : "Escolha uma função abaixo e clique na tecla do desenho que vai usá-la. Cada tecla aceita uma função.")
     : `Tecla <b></b>: ${adv[pos] ? "tem " + ADV_TYPES[adv[pos].type]?.[0] : "sem função avançada"}. Escolha o tipo e ajuste abaixo.`;
   if (pos !== null) $("advinfo").querySelector("b").textContent = keyNameOf(pos);
-  $("advtypes").innerHTML = pos === null ? "" : Object.entries(ADV_TYPES).filter(([t]) => advFeatures.has(t))
-    .map(([t, [name, desc]]) => `<button data-t="${t}" class="${advDraft?.type === t ? "active" : ""}">${name}<small>${desc}</small></button>`).join("");
+  $("advtypes").innerHTML = Object.entries(ADV_TYPES).filter(([t]) => advFeatures.has(t))
+    .map(([t, [name, desc, ex]]) => `<button data-t="${t}" class="${(advDraft?.type ?? advPendingType) === t ? "active" : ""}">${name}<small>${desc}<em>Exemplo: ${ex}</em></small></button>`).join("");
   document.querySelectorAll("#advtypes button").forEach((b) => (b.onclick = () => {
+    if (pos === null) { advPendingType = advPendingType === b.dataset.t ? null : b.dataset.t; showAdvPanel(); return; }
     advDraft = adv[pos]?.type === b.dataset.t ? JSON.parse(JSON.stringify(adv[pos])) : newDraft(b.dataset.t, pos);
     showAdvPanel();
   }));
@@ -1429,13 +1481,14 @@ function drawAdvEditor() {
     ed.querySelectorAll("input[data-dep]").forEach((inp) => (inp.onchange = () => (d.depths[inp.dataset.dep] = Math.max(0.1, Math.min(4, Number(inp.value) || 0.1)))));
   } else if (d.type === "MT") {
     ed.innerHTML = `<div class="row"><label class="field"><span>Ao segurar</span>${keySlot("mth")}</label><label class="field"><span>Ao tocar</span>${keySlot("mtt")}</label>
-      <label class="field"><span>Segurar a partir de (ms)</span><input type="number" id="mtd" min="50" max="2000"></label></div>`;
+      <label class="field"><span>Segurar a partir de (ms)</span><input type="number" id="mtd" min="50" max="2000"></label></div>
+      <p class="note">O teclado espera esse tempo para saber se foi toque ou segurar, então o toque sai um pouco mais lento (padrão: 200 ms). Se "ao segurar" for Ctrl, Shift ou Alt e você apertar outra tecla junto, ele vale na hora.</p>`;
     $("mtd").value = d.delay;
     bindSlot("mth", "ao segurar", () => d.hold, (v) => (d.hold = v)); bindSlot("mtt", "ao tocar", () => d.tap, (v) => (d.tap = v));
     $("mtd").onchange = () => (d.delay = Math.max(1, Math.min(65535, Number($("mtd").value) || 200)));
   } else if (d.type === "TGL") {
     ed.innerHTML = `<div class="row"><label class="field"><span>Tecla</span>${keySlot("tgk")}</label><label class="field"><span>Toque curto até (ms)</span><input type="number" id="tgd" min="50" max="2000"></label></div>
-      <p class="note">Toque curto prende/solta a tecla; segurando mais que esse tempo ela funciona normal.</p>`;
+      <p class="note">Toque curto prende ou solta a tecla; segurando mais que esse tempo ela funciona normal. Como o teclado precisa esperar para decidir, esta tecla responde um pouco mais devagar. Rapid Trigger com distância pequena melhora, mas não iguala uma tecla comum.</p>`;
     $("tgd").value = d.delay;
     bindSlot("tgk", "tecla", () => d.key, (v) => (d.key = v)); $("tgd").onchange = () => (d.delay = Math.max(1, Math.min(65535, Number($("tgd").value) || 200)));
   } else if (d.type === "END") {
@@ -1453,11 +1506,12 @@ function drawAdvEditor() {
     const keyOpts = layout.filter((k, i, a) => a.findIndex((x) => x.p === k.p) === i).map((k) => `<option value="${k.p}">${k.n}</option>`).join("");
     ed.innerHTML = `<div class="row"><label class="field"><span>Tecla 1</span><select class="in" id="sc1">${keyOpts}</select></label>
       <label class="field"><span>Tecla 2</span><select class="in" id="sc2">${keyOpts}</select></label>
-      <label class="field"><span>Quando as duas estão apertadas</span><select class="in" id="scm">${SOCD_MODES.map(([v, t]) => `<option value="${v}">${t}</option>`).join("")}</select></label></div>
-      <p class="note">Exemplo: A e D num jogo. Com "a última apertada vale", segurar A e apertar D faz andar para a direita.</p>`;
-    $("sc1").value = d.keys[0]; $("sc2").value = d.keys[1] ?? d.keys[0]; $("scm").value = d.mode;
+      </div>
+      <div class="field"><span>Quando as duas estão apertadas</span><div class="optlist" id="scm">${SOCD_MODES.map(([v, t, h]) => `<button type="button" data-m="${v}" class="${d.mode === v ? "active" : ""}">${t}<small>${h}</small></button>`).join("")}</div></div>
+      <p class="note">Exemplo: A e D num jogo. Com "a última apertada vale", segurar A e apertar D faz andar para a direita. Cuidado no CS2: nos servidores oficiais, a Valve pode expulsar da partida quem usa esse tipo de automação.</p>`;
+    $("sc1").value = d.keys[0]; $("sc2").value = d.keys[1] ?? d.keys[0];
     $("sc1").onchange = () => (d.keys[0] = Number($("sc1").value)); $("sc2").onchange = () => (d.keys[1] = Number($("sc2").value));
-    $("scm").onchange = () => (d.mode = Number($("scm").value));
+    ed.querySelectorAll("#scm button").forEach((b) => (b.onclick = () => { d.mode = Number(b.dataset.m); ed.querySelectorAll("#scm button").forEach((x) => x.classList.toggle("active", x === b)); }));
   }
   drawAdvPick();
 }
