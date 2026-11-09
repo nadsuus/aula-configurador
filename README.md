@@ -25,6 +25,10 @@ Depois, na pasta do projeto:
 - `cargo tauri dev`: abre o app em modo de teste (a primeira compilação demora).
 - `cargo tauri build`: gera o instalador em `src-tauri\target\release\bundle\nsis\`.
 
+O instalador é por usuário (não pede administrador) e pode ser feito em português ou inglês. Ele não tem
+assinatura digital, então o SmartScreen do Windows pode avisar: clique em **Mais informações** e
+**Executar assim mesmo**.
+
 ## Página no navegador
 
 1. Sirva a pasta `web`: `python3 -m http.server 8765 --bind 127.0.0.1 --directory web`
@@ -60,6 +64,7 @@ A tela segue o mesmo desenho do site oficial: perfis na lateral, abas em cima, t
   - **curso ao vivo**: mostra quanto cada tecla afundou e quando ela aciona
   - **calibração** das teclas, com cada tecla ficando verde quando termina
 - **Dispositivo**: taxa de resposta (polling), suspensão, modo Mac, trava da tecla Windows
+- **Idioma**: português ou inglês, no seletor da barra lateral; na primeira vez segue o idioma do sistema
 - Log dos bytes enviados e recebidos
 
 De propósito **não** mexe em firmware nem em reset de fábrica.
@@ -71,6 +76,7 @@ De propósito **não** mexe em firmware nem em reset de fábrica.
 - `web/transport.js`: como os pacotes chegam ao teclado (WebHID no navegador, Rust no app)
 - `web/layouts.js`: posição das teclas de cada modelo, extraída do app oficial
 - `web/keycodes.js`: códigos das funções de tecla, extraídos do app oficial
+- `web/i18n.js`: as traduções e o seletor de idioma
 - `web/keycap3d.js`: a keycap 3D da aba Desempenho
 - `web/vendor/`: cópia local do Three.js (licença MIT), usada pela keycap 3D
 - `src-tauri/src/main.rs`: a parte em Rust do app (USB pela biblioteca hidapi)

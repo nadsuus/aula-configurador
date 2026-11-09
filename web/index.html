@@ -49,6 +49,8 @@
   .mycreate button { padding: 0 9px; border-radius: 6px; border: 0; background: var(--side-2); color: var(--side-text); }
   .side-foot { margin-top: auto; display: grid; gap: 8px; }
   .side-foot button { padding: 9px; border-radius: 6px; border: 0; background: var(--side-2); color: var(--side-text); }
+  .langrow { justify-content: space-between; }
+  .langrow select { padding: 4px 6px; border-radius: 4px; border: 1px solid var(--side-2); background: var(--side-2); color: var(--side-text); font: inherit; }
   .side-foot label { color: var(--side-muted); display: flex; gap: 8px; align-items: center; font-size: 13px; }
 
   .main { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
@@ -322,6 +324,7 @@
       <span id="status">Desconectado</span>
       <button id="reload" disabled>Reler do teclado</button>
       <button id="connect2">Conectar teclado</button>
+      <label class="langrow"><span>Idioma</span><select id="lang" translate="no"></select></label>
       <label><input type="checkbox" id="logon"> Mostrar log de pacotes</label>
     </div>
   </aside>
@@ -573,6 +576,7 @@
   </div>
 </div>
 
+<script src="i18n.js"></script>
 <script src="layouts.js"></script>
 <script src="keycodes.js"></script>
 <script src="protocol.js"></script>
@@ -850,7 +854,7 @@ function drawSideProfiles() {
   const list = $("myprofiles"); list.innerHTML = "";
   myProfiles.forEach((m, i) => {
     const row = document.createElement("div"); row.className = "myrow";
-    const b = document.createElement("button"); b.textContent = m.name; b.title = m.name; b.dataset.i = i; b.disabled = !kb;
+    const b = document.createElement("button"); b.textContent = m.name; b.title = m.name; b.translate = false; b.dataset.i = i; b.disabled = !kb;
     b.onclick = () => applyProfile("mine:" + m.name, m.name, () => myProfiles.find((x) => x.name === m.name));
     const del = document.createElement("button"); del.className = "del"; del.textContent = "×"; del.title = "Apagar perfil";
     del.onclick = () => {
@@ -866,7 +870,7 @@ function drawSideProfiles() {
   const box = $("mycreate"); box.innerHTML = "";
   if (creatingProfile) {
     box.className = "mycreate";
-    const inp = document.createElement("input"); inp.maxLength = 24; inp.placeholder = "Nome do perfil"; inp.value = `Meu perfil ${myProfiles.length + 1}`;
+    const inp = document.createElement("input"); inp.maxLength = 24; inp.placeholder = "Nome do perfil"; inp.value = I18N.t(`Meu perfil ${myProfiles.length + 1}`);
     const ok = document.createElement("button"); ok.textContent = "Salvar";
     const no = document.createElement("button"); no.textContent = "×"; no.title = "Cancelar";
     ok.onclick = () => createMyProfile(inp.value);
@@ -1977,6 +1981,7 @@ async function connect() {
 if (window.__TAURI__) $("browserhint").remove();
 $("connect").onclick = connect; $("connect2").onclick = connect;
 $("reload").onclick = () => loadAll();
+I18N.start();
 </script>
 </body>
 </html>
