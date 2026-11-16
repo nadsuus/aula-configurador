@@ -606,7 +606,7 @@ async function guarded(label, fn) {
 async function step(name, fn) {
   try { return await fn(); } catch (e) { console.warn(name, e); log("!!", `${name}: ${e.message}`); return undefined; }
 }
-const mm = (v) => `${Number(v).toFixed(2)} mm`;
+const mm = (v) => fmtMm(v);
 
 // ---------- Abas ----------
 function setTab(t) {
@@ -765,7 +765,7 @@ function drawKeycap() {
   const rel = act - Number($("split").checked ? $("release").value : $("press").value);
   $("kc-rt").style.display = $("rt").checked && rel > 0.05 ? "" : "none";
   $("kc-rel").setAttribute("y1", gy(rel)); $("kc-rel").setAttribute("y2", gy(rel)); $("kc-relt").setAttribute("y", gy(rel) + 3);
-  $("kc-cur").textContent = kcLive ? `Ao vivo: ${kcLive.mm.toFixed(2)} mm${kcLive.pressed ? " · acionou" : ""}` : `Aciona em ${act.toFixed(2)} mm (de ${max.toFixed(1)} mm)`;
+  $("kc-cur").textContent = kcLive ? `Ao vivo: ${fmtMm(kcLive.mm)}${kcLive.pressed ? " · acionou" : ""}` : `Aciona em ${fmtMm(act)} (de ${fmtMm(max, 1)})`;
 }
 function showVals() {
   drawKeycap();
@@ -782,7 +782,7 @@ function fillPerfControls() {
   $("target").textContent = perfMode === "global" ? "Vale para todas as teclas"
     : tg.length ? `Vale para ${tg.length} tecla(s) selecionada(s)` : "Clique nas teclas do desenho para escolher";
   const max = maxTravelFor(tg.length ? tg : allPos());
-  $("travelmax").textContent = `Esse switch vai até ${max.toFixed(1)} mm; acima disso o valor é cortado. Mínimo 0.10 mm.`;
+  $("travelmax").textContent = `Esse switch vai até ${fmtMm(max, 1)}; acima disso o valor é cortado. Mínimo 0,10 mm.`;
   const first = tg.find((p) => travel[p]) ?? allPos().find((p) => travel[p]);
   if (first === undefined) return showVals();
   $("travel").value = travel[first].mm;
@@ -826,7 +826,7 @@ try { virtualBySlot = JSON.parse(localStorage.getItem("aula-virtual-profiles") |
 const saveVirtual = () => { try { localStorage.setItem("aula-virtual-profiles", JSON.stringify(virtualBySlot)); } catch {} };
 try { myProfiles = JSON.parse(localStorage.getItem("aula-perf-profiles") || "[]"); } catch { myProfiles = []; }
 const saveMyProfiles = () => { try { localStorage.setItem("aula-perf-profiles", JSON.stringify(myProfiles)); } catch {} };
-const fmtMm = (v) => `${v.toFixed(2).replace(".", ",")} mm`;
+const fmtMm = (v, casas = 2) => `${Number(v).toFixed(casas).replace(".", ",")} mm`;
 const copyOf = (x) => structuredClone(x);
 const currentPerf = () => ({ travel: copyOf(travel), rtv: copyOf(rtv), dz: copyOf(dz), polling: curPolling });
 function presetData(preset) {
@@ -1011,8 +1011,8 @@ function onLive(keys) {
     if (k.mm > 0.005) {
       recent.set(k.pos, now);
       const t = travel[k.pos];
-      $("liveinfo").textContent = `${e.name}: ${k.mm.toFixed(2)} mm de ${keyMax(k.pos).toFixed(1)}`
-        + (t ? ` · aciona em ${t.mm.toFixed(2)} mm` : "") + (k.pressed ? " · ACIONOU" : "");
+      $("liveinfo").textContent = `${e.name}: ${fmtMm(k.mm)} de ${fmtMm(keyMax(k.pos), 1)}`
+        + (t ? ` · aciona em ${fmtMm(t.mm)}` : "") + (k.pressed ? " · ACIONOU" : "");
     }
   }
 }
