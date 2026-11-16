@@ -312,6 +312,9 @@
   #status { font-size: 13px; }
   #status.ok { color: #4cd685; } #status.err { color: #ff8a7f; }
   pre#log { max-height: 220px; overflow: auto; font: 12px/1.4 ui-monospace, monospace; background: var(--panel); border: 1px solid var(--line); padding: 8px; border-radius: 8px; margin: 0; }
+  /* Foco de teclado nas teclas do desenho: anel por fora, sem apagar o contorno de selecao (outline) */
+  #kb .key:focus-visible { outline-offset: -2px; box-shadow: 0 0 0 2px var(--card), 0 0 0 4px var(--accent); z-index: 1; }
+  #kb .key:focus-visible:not(.sel):not(.pick) { outline: none; }
 </style>
 </head>
 <body>
@@ -370,7 +373,7 @@
       <div class="stage" id="stage">
         <div class="pressbar hidden" id="pressbar"><span class="note">Aperte teclas no teclado: elas aparecem aqui.</span></div>
         <div class="stage-row">
-          <div class="kbwrap"><div class="sidelight hidden" id="sidelight" title="Barra de luz"></div><div id="kb"></div></div>
+          <div class="kbwrap"><div class="sidelight hidden" id="sidelight" title="Barra de luz"></div><div id="kb" role="group" aria-label="Desenho do teclado"></div></div>
           <div class="stage-side hidden" id="selbtns">
             <button id="selall">Selecionar todas</button>
             <button id="selwasd">WASD</button>
@@ -656,7 +659,10 @@ document.querySelectorAll("#tabs button").forEach((b) => (b.onclick = () => setT
 const keyName = (k) => k.n.replace(/^[LR]_/, "");
 function drawKeyboard() {
   if (!layout.length || $("stage").classList.contains("hidden")) return;
-  const kbEl = $("kb"); kbEl.replaceChildren(); keyEls = {};
+  const kbEl = $("kb");
+  const focusPos = kbEl.contains(document.activeElement) ? document.activeElement.dataset.p : kbEl.querySelector('[tabindex="0"]')?.dataset.p;
+  const hadFocus = kbEl.contains(document.activeElement);
+  kbEl.replaceChildren(); keyEls = {};
   const drawn = [];
   const maxX = Math.max(...layout.map((k) => k.x + k.w)), maxY = Math.max(...layout.map((k) => k.y + k.h));
   const side = !$("selbtns").classList.contains("hidden") || !$("layerbox").classList.contains("hidden") ? 170 : 0;
@@ -674,13 +680,38 @@ function drawKeyboard() {
     el.querySelector("b").textContent = keyName(k);
     el.onclick = () => onKeyClick(k.p);
     el.dataset.p = k.p;
+    el.setAttribute("role", "button"); el.tabIndex = -1; // foco itinerante: so uma tecla fica no Tab, as setas andam
     kbEl.appendChild(el);
     el.style.setProperty("--kx", ((k.x + k.w / 2) / maxX).toFixed(3));
     keyEls[k.p] = { el, kx: (k.x + k.w / 2) / maxX, cx: k.x + k.w / 2, cy: k.y + k.h / 2, fill: el.querySelector(".fill"), b: el.querySelector("b"), i: el.querySelector("i"), name: keyName(k), n: k.n };
   }
+  const roving = (focusPos !== undefined && keyEls[focusPos]?.el) || kbEl.querySelector(".key");
+  if (roving) { roving.tabIndex = 0; if (hadFocus) roving.focus(); }
   $("sidelight").style.width = kbEl.style.width;
   updateKeys();
 }
+// Teclado no desenho: Enter/Espaco clicam na tecla focada; setas levam o foco para a tecla vizinha.
+// Nas abas em que o app bloqueia teclas (teclado conectado lendo o USB), o evento chega com
+// defaultPrevented e nada acontece aqui, igual aos outros botoes dessas abas.
+$("kb").addEventListener("keydown", (e) => {
+  const el = e.target.closest?.(".key");
+  if (!el || e.defaultPrevented) return;
+  if (e.key === "Enter" || e.key === " ") { e.preventDefault(); el.click(); return; }
+  const dir = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key];
+  if (!dir) return;
+  e.preventDefault();
+  const from = keyEls[el.dataset.p];
+  let best = null, bestScore = Infinity;
+  for (const k of Object.values(keyEls)) {
+    const dx = k.cx - from.cx, dy = k.cy - from.cy;
+    const ahead = dx * dir[0] + dy * dir[1], side = Math.abs(dx * dir[1] + dy * dir[0]);
+    if (ahead <= 0.5) continue; // so teclas a frente na direcao da seta
+    const score = ahead + side * 3;
+    if (score < bestScore) { bestScore = score; best = k; }
+  }
+  if (!best) return;
+  el.tabIndex = -1; best.el.tabIndex = 0; best.el.focus();
+});
 
 function updateKeys() {
   showLightPreview();
@@ -2034,8 +2065,14 @@ function syncSelected(el) {
   if (el.matches("#tabs button")) {
     if (el.classList.contains("active")) el.setAttribute("aria-current", "page"); else el.removeAttribute("aria-current");
   } else if (el.matches(PRESSABLE)) el.setAttribute("aria-pressed", String(el.classList.contains("active")));
+  else if (el.matches("#kb .key")) {
+    // tecla do desenho: so vira "botao de alternar" quando da para escolher teclas (Desempenho individual, Botao, Avancadas)
+    const escolhe = el.classList.contains("click") || tab === "button" || tab === "adv";
+    if (escolhe) el.setAttribute("aria-pressed", String(el.classList.contains("sel") || el.classList.contains("pick")));
+    else el.removeAttribute("aria-pressed");
+  }
 }
-const SELECTABLE = "#tabs button, " + PRESSABLE;
+const SELECTABLE = "#tabs button, #kb .key, " + PRESSABLE;
 document.querySelectorAll(SELECTABLE).forEach(syncSelected);
 new MutationObserver((list) => {
   for (const m of list) {
