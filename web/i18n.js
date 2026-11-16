@@ -36,7 +36,7 @@ const EN = {
   "Calibrar teclas": "Calibrate keys", "Curso ao vivo": "Live travel", "Calibrar:": "Calibrate:", "Curso ao vivo:": "Live travel:",
   "ensina ao teclado o curso real de cada tecla; use se alguma acionar fora do ponto.": "teaches the keyboard each key's real travel; use it if a key triggers off its point.",
   "mostra quanto cada tecla afundou, para testar os ajustes.": "shows how far each key went down, to test your settings.",
-  "Aciona em {} mm (de {} mm)": "Triggers at {} mm (of {} mm)", "Ao vivo: {} mm{}": "Live: {} mm{}", " · ACIONOU": " · TRIGGERED", "· ACIONOU": "· TRIGGERED", "· aciona em {} mm": "· triggers at {} mm",
+  "Aciona em {} mm (de {} mm)": "Triggers at {} mm (of {} mm)", "Ao vivo: {} mm{}": "Live: {} mm{}", "Ao vivo: {} mm": "Live: {} mm"," · ACIONOU": " · TRIGGERED", "· ACIONOU": "· TRIGGERED", "· acionou": "· triggered", "· aciona em {} mm": "· triggers at {} mm",
   "Esse switch vai até {} mm; acima disso o valor é cortado. Mínimo 0,10 mm.": "This switch goes up to {} mm; anything above is capped. Minimum 0.10 mm.",
   "Régua do curso da tecla": "Key travel ruler", "solta": "release", "Rapid Trigger (RT)": "Rapid Trigger (RT)",
   "A tecla solta e aciona de novo assim que muda de direção.": "The key releases and triggers again as soon as it changes direction.",

@@ -1012,8 +1012,9 @@ function onLive(keys) {
     if (k.mm > 0.005) {
       recent.set(k.pos, now);
       const t = travel[k.pos];
-      $("liveinfo").textContent = `${e.name}: ${fmtMm(k.mm)} de ${fmtMm(keyMax(k.pos), 1)}`
-        + (t ? ` · aciona em ${fmtMm(t.mm)}` : "") + (k.pressed ? " · ACIONOU" : "");
+      // Cada parte vira um texto separado para a camada de idioma traduzir uma por uma.
+      $("liveinfo").replaceChildren(`${e.name}: ${fmtMm(k.mm)} de ${fmtMm(keyMax(k.pos), 1)}`,
+        t ? ` · aciona em ${fmtMm(t.mm)}` : "", k.pressed ? " · ACIONOU" : "");
     }
   }
 }
