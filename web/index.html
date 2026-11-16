@@ -6,6 +6,7 @@
 <title>Configurador Aula HERO</title>
 <style>
   :root {
+    color-scheme: light dark;
     --bg: #eef0f3; --panel: #f7f8fa; --card: #ffffff; --text: #1d1f23; --muted: #6b7079; --line: #dde1e7;
     --side: #262a33; --side-2: #323743; --side-text: #e9ebef; --side-muted: #9aa1ad;
     --accent: #1f6fd1; --accent-soft: #e3eefb; --purple: #7b3fe4;
@@ -639,7 +640,7 @@ document.querySelectorAll("#tabs button").forEach((b) => (b.onclick = () => setT
 const keyName = (k) => k.n.replace(/^[LR]_/, "");
 function drawKeyboard() {
   if (!layout.length || $("stage").classList.contains("hidden")) return;
-  const kbEl = $("kb"); kbEl.innerHTML = ""; keyEls = {};
+  const kbEl = $("kb"); kbEl.replaceChildren(); keyEls = {};
   const drawn = [];
   const maxX = Math.max(...layout.map((k) => k.x + k.w)), maxY = Math.max(...layout.map((k) => k.y + k.h));
   const side = !$("selbtns").classList.contains("hidden") || !$("layerbox").classList.contains("hidden") ? 170 : 0;
@@ -826,7 +827,7 @@ const saveVirtual = () => { try { localStorage.setItem("aula-virtual-profiles", 
 try { myProfiles = JSON.parse(localStorage.getItem("aula-perf-profiles") || "[]"); } catch { myProfiles = []; }
 const saveMyProfiles = () => { try { localStorage.setItem("aula-perf-profiles", JSON.stringify(myProfiles)); } catch {} };
 const fmtMm = (v) => `${v.toFixed(2).replace(".", ",")} mm`;
-const copyOf = (x) => JSON.parse(JSON.stringify(x));
+const copyOf = (x) => structuredClone(x);
 const currentPerf = () => ({ travel: copyOf(travel), rtv: copyOf(rtv), dz: copyOf(dz), polling: curPolling });
 function presetData(preset) {
   const data = { travel: {}, rtv: {}, polling: PRESET_POLLING }, rest = preset.groups.find((g) => !g.keys), group = new Map();
@@ -851,7 +852,7 @@ function markSideProfiles() {
   document.querySelectorAll("#readyprofiles [data-preset]").forEach((b) => b.classList.toggle("active", ready(b.dataset.preset)));
 }
 function drawSideProfiles() {
-  const list = $("myprofiles"); list.innerHTML = "";
+  const list = $("myprofiles"); list.replaceChildren();
   myProfiles.forEach((m, i) => {
     const row = document.createElement("div"); row.className = "myrow";
     const b = document.createElement("button"); b.textContent = m.name; b.title = m.name; b.translate = false; b.dataset.i = i; b.disabled = !kb;
@@ -867,7 +868,7 @@ function drawSideProfiles() {
     };
     row.append(b, del); list.appendChild(row);
   });
-  const box = $("mycreate"); box.innerHTML = "";
+  const box = $("mycreate"); box.replaceChildren();
   if (creatingProfile) {
     box.className = "mycreate";
     const inp = document.createElement("input"); inp.maxLength = 24; inp.placeholder = "Nome do perfil"; inp.value = I18N.t(`Meu perfil ${myProfiles.length + 1}`);
@@ -875,7 +876,7 @@ function drawSideProfiles() {
     const no = document.createElement("button"); no.textContent = "×"; no.title = "Cancelar";
     ok.onclick = () => createMyProfile(inp.value);
     no.onclick = () => { creatingProfile = false; drawSideProfiles(); };
-    inp.onkeydown = (e) => { if (e.key === "Enter") ok.onclick(); if (e.key === "Escape") no.onclick(); e.stopPropagation(); };
+    inp.onkeydown = (e) => { if (e.key === "Enter" && !e.isComposing) ok.onclick(); if (e.key === "Escape") no.onclick(); e.stopPropagation(); };
     box.append(inp, ok, no); inp.focus(); inp.select();
   } else {
     box.className = "";
@@ -1384,7 +1385,7 @@ function drawPressBar() {
   if (!pressSeq.length) { bar.innerHTML = `<span class="note">Aperte teclas no teclado: elas aparecem aqui.</span>`; return; }
   const name = (p) => keyEls[p]?.name ?? keyNameOf(p);
   const rank = (p) => { const i = MOD_ORDER.findIndex((m) => name(p).startsWith(m)); return i < 0 ? 99 : i; };
-  const seq = [...pressSeq].sort((a, b) => rank(a) - rank(b));
+  const seq = pressSeq.toSorted((a, b) => rank(a) - rank(b));
   bar.innerHTML = seq.map((p, i) => `${i ? '<span class="plus">+</span>' : ""}<kbd class="${btnDown.has(p) ? "on" : ""}"></kbd>`).join("")
     + `<span class="does"></span>`;
   bar.querySelectorAll("kbd").forEach((k, i) => (k.textContent = name(seq[i])));
@@ -1607,7 +1608,7 @@ function drawAdvPick() {
 function pickAdv(pos) {
   advPicked = advPicked === pos ? null : pos;
   const a = advPicked !== null ? adv[advPicked] : null;
-  advDraft = a ? JSON.parse(JSON.stringify(a)) : advPicked !== null && advPendingType ? newDraft(advPendingType, advPicked) : null;
+  advDraft = a ? structuredClone(a) : advPicked !== null && advPendingType ? newDraft(advPendingType, advPicked) : null;
   if (advPicked !== null) advPendingType = null;
   updateKeys(); showAdvPanel();
 }
@@ -1634,7 +1635,7 @@ function showAdvPanel() {
     .map(([t, [name, desc, ex, warn]]) => `<button data-t="${t}" class="${(advDraft?.type ?? advPendingType) === t ? "active" : ""}">${name}<small>${desc}<em>Exemplo: ${ex}</em>${warn ? `<strong class="redwarn">${warn}</strong>` : ""}</small></button>`).join("");
   document.querySelectorAll("#advtypes button").forEach((b) => (b.onclick = () => {
     if (pos === null) { advPendingType = advPendingType === b.dataset.t ? null : b.dataset.t; showAdvPanel(); return; }
-    advDraft = adv[pos]?.type === b.dataset.t ? JSON.parse(JSON.stringify(adv[pos])) : newDraft(b.dataset.t, pos);
+    advDraft = adv[pos]?.type === b.dataset.t ? structuredClone(adv[pos]) : newDraft(b.dataset.t, pos);
     showAdvPanel();
   }));
   $("advsave").disabled = pos === null || !advDraft;
@@ -1645,7 +1646,7 @@ function drawAdvEditor() {
   const d = advDraft, ed = $("adved");
   ed.classList.toggle("hidden", !d);
   advSlots = {};
-  if (!d) { ed.innerHTML = ""; drawAdvPick(); return; }
+  if (!d) { ed.replaceChildren(); drawAdvPick(); return; }
   if (d.type === "DKS") {
     if (!d.ui) { d.keys = d.keys.map((k) => ({ value: k.value, sets: dksFromRaw(k.sets) })); d.ui = true; }
     ed.innerHTML = `<div class="grid4"><span>Ponto do curso (mm)</span>${d.depths.map((v, i) => `<label class="field"><span>${i + 1}. ${DKS_STAGES[i]}</span><input type="number" step="0.01" min="0.1" max="4" value="${v.toFixed(2)}" data-dep="${i}"></label>`).join("")}</div>
@@ -1707,7 +1708,7 @@ $("advsave").onclick = () => {
     if (old?.type === "SOCD") for (const p of old.keys) await kb.deleteAdvancedKey(0, p);
     await kb.setAdvancedKey(0, pos, out);
     await reloadAdv(d.type === "SOCD" ? [pos, ...d.keys] : [pos]);
-    advDraft = adv[pos] ? JSON.parse(JSON.stringify(adv[pos])) : advDraft;
+    advDraft = adv[pos] ? structuredClone(adv[pos]) : advDraft;
     updateKeys(); showAdvPanel();
   });
 };
