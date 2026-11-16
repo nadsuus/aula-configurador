@@ -326,7 +326,7 @@
     <h2 class="side-title">Perfis prontos</h2>
     <div class="profiles" id="readyprofiles"></div>
     <div class="side-foot">
-      <span id="status">Desconectado</span>
+      <span id="status" role="status">Desconectado</span>
       <button id="reload" disabled>Reler do teclado</button>
       <button id="connect2">Conectar teclado</button>
       <label class="langrow"><span>Idioma</span><select id="lang" translate="no"></select></label>
@@ -336,13 +336,13 @@
 
   <div class="main">
     <nav class="tabs" id="tabs">
-      <button data-tab="button"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v12H3zm2 2v2h2V8zm3 0v2h2V8zm3 0v2h2V8zm3 0v2h2V8zm3 0v2h2V8zM5 11v2h2v-2zm3 0v2h2v-2zm3 0v2h2v-2zm3 0v2h2v-2zm3 0v2h2v-2zM7 14v2h10v-2z"/></svg>BOTÃO</button>
-      <button data-tab="sc"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 7h7v10H3zm11 0h7v10h-7zM11 11h2v2h-2z"/></svg>ATALHOS</button>
-      <button data-tab="light"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2zM9 19h6v1a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2z"/></svg>ILUMINAÇÃO</button>
-      <button data-tab="macro"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h12v4h4v12H8v-4H4zm2 2v8h2V8h6V6z"/></svg>MACRO</button>
-      <button data-tab="perf" class="active"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 12h3v8H5zm5.5-8h3v16h-3zM16 9h3v11h-3z"/></svg>DESEMPENHO</button>
-      <button data-tab="adv"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.7 18.6 13 9.9a5.5 5.5 0 0 0-7.1-7.1l3.6 3.6-3 3-3.6-3.6A5.5 5.5 0 0 0 10 12.9l8.7 8.7z"/></svg>TECLAS AVANÇADAS</button>
-      <button data-tab="device"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm9 5.5v-3l-2.4-.6a7 7 0 0 0-.7-1.7l1.3-2.1-2.1-2.1-2.1 1.3a7 7 0 0 0-1.7-.7L12.6 2h-3l-.6 2.4a7 7 0 0 0-1.7.7L5.2 3.8 3.1 5.9l1.3 2.1a7 7 0 0 0-.7 1.7L1.3 10.3v3l2.4.6c.2.6.4 1.2.7 1.7l-1.3 2.1 2.1 2.1 2.1-1.3c.5.3 1.100.5 1.7.7l.6 2.4h3l.6-2.4c.6-.2 1.2-.4 1.7-.7l2.1 1.3 2.1-2.1-1.3-2.1c.3-.5.5-1.1.7-1.7z"/></svg>DISPOSITIVO</button>
+      <button data-tab="button"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 6h18v12H3zm2 2v2h2V8zm3 0v2h2V8zm3 0v2h2V8zm3 0v2h2V8zm3 0v2h2V8zM5 11v2h2v-2zm3 0v2h2v-2zm3 0v2h2v-2zm3 0v2h2v-2zm3 0v2h2v-2zM7 14v2h10v-2z"/></svg>BOTÃO</button>
+      <button data-tab="sc"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 7h7v10H3zm11 0h7v10h-7zM11 11h2v2h-2z"/></svg>ATALHOS</button>
+      <button data-tab="light"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2zM9 19h6v1a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2z"/></svg>ILUMINAÇÃO</button>
+      <button data-tab="macro"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 4h12v4h4v12H8v-4H4zm2 2v8h2V8h6V6z"/></svg>MACRO</button>
+      <button data-tab="perf" class="active"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 12h3v8H5zm5.5-8h3v16h-3zM16 9h3v11h-3z"/></svg>DESEMPENHO</button>
+      <button data-tab="adv"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.7 18.6 13 9.9a5.5 5.5 0 0 0-7.1-7.1l3.6 3.6-3 3-3.6-3.6A5.5 5.5 0 0 0 10 12.9l8.7 8.7z"/></svg>TECLAS AVANÇADAS</button>
+      <button data-tab="device"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm9 5.5v-3l-2.4-.6a7 7 0 0 0-.7-1.7l1.3-2.1-2.1-2.1-2.1 1.3a7 7 0 0 0-1.7-.7L12.6 2h-3l-.6 2.4a7 7 0 0 0-1.7.7L5.2 3.8 3.1 5.9l1.3 2.1a7 7 0 0 0-.7 1.7L1.3 10.3v3l2.4.6c.2.6.4 1.2.7 1.7l-1.3 2.1 2.1 2.1 2.1-1.3c.5.3 1.100.5 1.7.7l.6 2.4h3l.6-2.4c.6-.2 1.2-.4 1.7-.7l2.1 1.3 2.1-2.1-1.3-2.1c.3-.5.5-1.1.7-1.7z"/></svg>DISPOSITIVO</button>
     </nav>
 
     <div id="welcome" class="welcome">
@@ -429,7 +429,7 @@
         </section>
         <section>
           <div class="ph"><div><h3>Rapid Trigger (RT)</h3><p>A tecla solta e aciona de novo assim que muda de direção.</p></div>
-            <label class="sw" title="Ligar ou desligar"><input type="checkbox" id="rt"><span></span></label></div>
+            <label class="sw" title="Ligar ou desligar"><input type="checkbox" id="rt" aria-label="Rapid Trigger (RT)"><span></span></label></div>
           <div class="help">
             <p><b>Desligado:</b> a tecla só volta a valer depois de subir até um ponto fixo.</p>
             <p><b>Ligado:</b> basta subir um pouquinho para soltar e descer um pouquinho para acionar de novo. Ajuda a repetir toques e a parar o movimento mais rápido nos jogos.</p>
@@ -443,13 +443,13 @@
             <div class="hs"><button class="pm" data-for="release" data-d="-0.01">−</button><input type="range" id="release" min="0.01" max="4" step="0.01"><button class="pm" data-for="release" data-d="0.01">+</button><span class="v" id="release-v"></span></div>
             <div class="row" style="justify-content:space-between;flex-wrap:nowrap">
               <div><div>Ajustar apertar e soltar separados</div><div class="note">Desligado, soltar usa o mesmo valor de apertar.</div></div>
-              <label class="sw"><input type="checkbox" id="split"><span></span></label>
+              <label class="sw"><input type="checkbox" id="split" aria-label="Ajustar apertar e soltar separados"><span></span></label>
             </div>
           </div>
         </section>
         <section>
           <div class="ph"><div><h3>Zona morta</h3><p>Em cima evita toque acidental; embaixo evita a tecla soltar sozinha no fundo.</p></div>
-            <label class="sw" title="Ligar ou desligar"><input type="checkbox" id="dzon"><span></span></label></div>
+            <label class="sw" title="Ligar ou desligar"><input type="checkbox" id="dzon" aria-label="Zona morta"><span></span></label></div>
           <div class="help">
             <p><b>Em cima:</b> o começo do curso não conta, para a tecla não acionar com um toque de leve.</p>
             <p><b>Embaixo:</b> tremidas no fundo da tecla não contam, para ela não soltar sozinha enquanto você segura.</p>
@@ -484,7 +484,7 @@
           <b>Aperte o atalho no teclado</b>
           <span class="note">Segure <b>Fn</b> e aperte uma tecla, por exemplo Fn + S.</span>
           <div class="capture" id="sccap"></div>
-          <span class="note">Se preferir, escolha aqui: Fn + <select class="in" id="sckey"></select></span>
+          <span class="note">Se preferir, escolha aqui: Fn + <select class="in" id="sckey" aria-label="Tecla do atalho"></select></span>
         </div></div>
         <div class="scstep"><div class="num">2</div><div class="body">
           <b>O que deve sair quando apertar?</b>
@@ -497,7 +497,7 @@
         </div></div>
         <div class="scstep"><div class="num">4</div><div class="body">
           <b>Teste</b>
-          <input type="text" id="sctest" class="sctest" placeholder="Clique aqui e aperte o atalho (ex.: Fn + S)">
+          <input type="text" id="sctest" class="sctest" aria-label="Testar o atalho" placeholder="Clique aqui e aperte o atalho (ex.: Fn + S)">
         </div></div>
         <div class="scsaved">
           <b>Seus atalhos</b>
@@ -536,7 +536,7 @@
               <div class="row"><button class="btn" id="paintall">Pintar todas</button><button class="btn" id="paintclear">Apagar todas</button></div>
             </div>
             <div class="cm notpaint" id="cmode"><button data-c="color" class="active">Cor única</button><button data-c="mix">Multicolorido</button></div>
-            <input type="color" id="lcolor" title="Escolher cor">
+            <input type="color" id="lcolor" title="Escolher cor" aria-label="Escolher cor">
             <div class="rgb"><label>R<input type="number" id="cr" min="0" max="255"></label><label>G<input type="number" id="cg" min="0" max="255"></label><label>B<input type="number" id="cb" min="0" max="255"></label><label>Hex<input type="text" id="chex" maxlength="7" spellcheck="false" autocomplete="off" title="Cor em hexadecimal, por exemplo #ff8800"></label></div>
             <div class="swatches" id="swatches"></div>
             <div class="notpaint">Velocidade</div>
@@ -862,10 +862,11 @@ function drawSideProfiles() {
     const b = document.createElement("button"); b.textContent = m.name; b.title = m.name; b.translate = false; b.dataset.i = i; b.disabled = !kb;
     b.onclick = () => applyProfile("mine:" + m.name, m.name, () => myProfiles.find((x) => x.name === m.name));
     const del = document.createElement("button"); del.className = "del"; del.textContent = "×"; del.title = "Apagar perfil";
+    del.setAttribute("aria-label", "Apagar perfil");
     del.onclick = () => {
       if (!del.classList.contains("sure")) { // apagar nao tem volta: pede um segundo clique
-        del.classList.add("sure"); del.textContent = "Apagar?";
-        setTimeout(() => { del.classList.remove("sure"); del.textContent = "×"; }, 2500);
+        del.classList.add("sure"); del.textContent = "Apagar?"; del.setAttribute("aria-label", "Clique de novo para apagar o perfil");
+        setTimeout(() => { del.classList.remove("sure"); del.textContent = "×"; del.setAttribute("aria-label", "Apagar perfil"); }, 2500);
         return;
       }
       myProfiles.splice(i, 1); saveMyProfiles(); drawSideProfiles();
@@ -877,7 +878,8 @@ function drawSideProfiles() {
     box.className = "mycreate";
     const inp = document.createElement("input"); inp.maxLength = 24; inp.placeholder = "Nome do perfil"; inp.value = I18N.t(`Meu perfil ${myProfiles.length + 1}`);
     const ok = document.createElement("button"); ok.textContent = "Salvar";
-    const no = document.createElement("button"); no.textContent = "×"; no.title = "Cancelar";
+    const no = document.createElement("button"); no.textContent = "×"; no.title = "Cancelar"; no.setAttribute("aria-label", "Cancelar");
+    inp.setAttribute("aria-label", "Nome do perfil");
     ok.onclick = () => createMyProfile(inp.value);
     no.onclick = () => { creatingProfile = false; drawSideProfiles(); };
     inp.onkeydown = (e) => { if (e.key === "Enter" && !e.isComposing) ok.onclick(); if (e.key === "Escape") no.onclick(); e.stopPropagation(); };
@@ -994,7 +996,15 @@ for (const id of ["rt", "split", "dzon"]) $(id).onchange = () => {
   if (id === "split" && !$("split").checked) $("release").value = $("press").value;
   showVals(); queueSave(groupOf[id]);
 };
+// Nome de cada slider para leitores de tela (o texto visivel fica fora do <label>)
+const SLIDER_NAMES = { travel: "Ponto de acionamento", press: "Sensibilidade ao apertar", release: "Sensibilidade ao soltar",
+  dztop: "Zona morta em cima", dzbot: "Zona morta embaixo", lspeed: "Velocidade", lbright: "Brilho" };
+for (const [id, name] of Object.entries(SLIDER_NAMES)) $(id).setAttribute("aria-label", name);
 // Botoes - e + de todos os paineis
+document.querySelectorAll(".pm").forEach((b) => {
+  const name = SLIDER_NAMES[b.dataset.for];
+  if (name) b.setAttribute("aria-label", `${Number(b.dataset.d) < 0 ? "Diminuir" : "Aumentar"}: ${name}`);
+});
 document.querySelectorAll(".pm").forEach((b) => (b.onclick = () => {
   const inp = $(b.dataset.for);
   if (inp.disabled) return;
@@ -1192,7 +1202,7 @@ function drawShortcutList() {
   $("sclist").querySelectorAll(".item").forEach((el, i) => {
     const [p, v] = list[i];
     el.textContent = `Fn + ${keyNameOf(p)} → ${describe({ value: v, macro: null })}`;
-    const x = document.createElement("button"); x.textContent = "×"; x.title = "Remover atalho";
+    const x = document.createElement("button"); x.textContent = "×"; x.title = "Remover atalho"; x.setAttribute("aria-label", "Remover atalho");
     x.onclick = () => guarded(`Removendo Fn + ${keyNameOf(p)}`, async () => {
       for (const l of FN_LAYERS) if (keymap[l]?.[p]?.value === v) await writeLayerKey(l, p, 0);
     });
@@ -1402,6 +1412,7 @@ function drawPressBar() {
 for (const ev of ["keydown", "keyup"]) window.addEventListener(ev, (e) => {
   if (!(tab === "button" || tab === "sc" || tab === "light") || !btnLive || e.ctrlKey || e.metaKey) return;
   if (e.target === $("sctest") || (e.target.tagName === "INPUT" && /^(text|number)$/.test(e.target.type))) return;
+  if (e.key === "Tab") return; // Tab continua movendo o foco (o teclado e lido pelo USB, nao por este evento)
   e.preventDefault();
 }, true);
 
@@ -1480,7 +1491,7 @@ function showMacroEditor() {
 function drawSteps() {
   const m = macros[mSel]; if (!m) return;
   $("msteps").innerHTML = m.steps.length ? m.steps.map((st, i) => `<tr><td>${i + 1}</td><td class="${st.up ? "up" : "down"}">${st.up ? "↑ sobe" : "↓ desce"}</td><td>${macroKeyName(st.code)}</td>
-    <td><input type="number" min="0" max="1048575" value="${st.delay}" data-i="${i}"></td><td><button class="x" data-i="${i}" title="Apagar passo">×</button></td></tr>`).join("")
+    <td><input type="number" min="0" max="1048575" value="${st.delay}" data-i="${i}"></td><td><button class="x" data-i="${i}" title="Apagar passo" aria-label="Apagar passo">×</button></td></tr>`).join("")
     : `<tr><td colspan="5" class="empty">Sem passos. Grave ou adicione abaixo.</td></tr>`;
   document.querySelectorAll("#msteps input").forEach((inp) => (inp.onchange = () => { m.steps[Number(inp.dataset.i)].delay = Math.max(0, Math.min(1048575, Number(inp.value) || 0)); saveMacros(); }));
   document.querySelectorAll("#msteps .x").forEach((b) => (b.onclick = () => { m.steps.splice(Number(b.dataset.i), 1); saveMacros(); drawSteps(); }));
