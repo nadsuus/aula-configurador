@@ -8,7 +8,10 @@
 
 [Português](#português) · [Download](https://github.com/nadsuus/aula-hero-configurator/releases) · [Use online](https://nadsuus.github.io/aula-hero-configurator/) · [Report a bug](https://github.com/nadsuus/aula-hero-configurator/issues/new/choose)
 
-![Performance tab of the Aula HERO Configurator: keyboard drawing with the actuation point of each key, and the actuation, Rapid Trigger and dead zone panels (sample values)](docs/screenshot.png)
+<picture>
+  <source media="(prefers-reduced-motion: reduce)" srcset="docs/screenshot.png">
+  <img src="docs/demo.gif" width="1000" alt="Performance tab of the Aula HERO Configurator: as the actuation point slider moves from 0.3 to 3.0 mm, the 3D keycap sinks to that depth on a mm ruler and every key on the keyboard drawing shows the new value (sample values)">
+</picture>
 
 > Unofficial project, not affiliated with Aula. It talks to the keyboard with the same USB protocol as the official web configurator (hero.aulastar.com).
 
