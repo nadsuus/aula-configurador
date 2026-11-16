@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Configurador Aula HERO</title>
+<link rel="icon" href="brand/nadsuus-mark.svg" type="image/svg+xml">
 <style>
   :root {
     color-scheme: light dark;
@@ -29,6 +30,7 @@
   .app { display: grid; grid-template-columns: 230px 1fr; gap: 10px; padding: 10px; min-height: 100%; }
   @media (max-width: 820px) { .app { grid-template-columns: 1fr; } }
   aside { background: var(--side); color: var(--side-text); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 14px; }
+  .brand { display: block; width: 156px; margin: 4px auto 2px; }
   .dev { background: var(--side-2); border-radius: 6px; padding: 12px; text-align: center; font-size: 13px; }
   .dev .name { font-weight: 600; font-size: 15px; }
   .dev .st { color: var(--side-muted); }
@@ -305,6 +307,7 @@
 <body>
 <div class="app">
   <aside>
+    <img class="brand" src="brand/nadsuus-logo.svg" alt="Nadsuus">
     <div class="dev">
       <div class="name" id="model">Nenhum teclado</div>
       <div class="st" id="devst">desconectado</div>
