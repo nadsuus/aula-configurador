@@ -1,0 +1,46 @@
+name: Bug report / Relatar problema
+description: Something doesn't work with your keyboard / Algo não funciona com o seu teclado
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! Before opening: connect the keyboard **by USB cable** and close the official website (hero.aulastar.com).
+        Obrigado por relatar! Antes de abrir: ligue o teclado **no cabo USB** e feche o site oficial.
+  - type: input
+    id: model
+    attributes:
+      label: Keyboard model / Modelo do teclado
+      description: As shown at the top of the sidebar / Como aparece no topo da barra lateral
+      placeholder: HERO 68 HE
+    validations:
+      required: true
+  - type: input
+    id: firmware
+    attributes:
+      label: Firmware
+      placeholder: "1.0.5"
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where / Onde
+      options:
+        - Windows app / App para Windows
+        - Online (Chrome)
+        - Online (Edge)
+        - Other / Outro
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened? / O que aconteceu?
+      description: Steps, what you expected and what happened instead / Passos, o que esperava e o que aconteceu
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Packet log / Log de pacotes
+      description: Optional. Turn on "Show packet log" in the sidebar, reproduce the problem and paste it here / Opcional. Ligue "Mostrar log de pacotes" na barra lateral, repita o problema e cole aqui
+      render: text

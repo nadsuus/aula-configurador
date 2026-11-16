@@ -3,6 +3,8 @@ name = "aula-configurador"
 version = "0.1.0"
 description = "Configurador para teclados Aula HERO"
 edition = "2021"
+license = "MIT"
+repository = "https://github.com/nadsuus/aula-hero-configurator"
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }

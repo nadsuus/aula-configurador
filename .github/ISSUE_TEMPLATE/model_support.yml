@@ -1,0 +1,32 @@
+name: Keyboard model support / Suporte a modelo de teclado
+description: Report that your model works, or ask for one that doesn't / Conte que seu modelo funciona ou peça um que não funciona
+labels: ["model support"]
+body:
+  - type: input
+    id: model
+    attributes:
+      label: Keyboard model / Modelo do teclado
+      description: Exact name from the box or the official website / Nome exato da caixa ou do site oficial
+      placeholder: HERO 84 HE
+    validations:
+      required: true
+  - type: input
+    id: shown
+    attributes:
+      label: Name shown by the app / Nome que o app mostra
+      description: 'Top of the sidebar after connecting, e.g. "Unknown (12345)" / Topo da barra lateral depois de conectar, ex.: "Desconhecido (12345)"'
+  - type: dropdown
+    id: status
+    attributes:
+      label: Status
+      options:
+        - Works / Funciona
+        - Partly works / Funciona em parte
+        - Doesn't work / Não funciona
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Details / Detalhes
+      description: Which tabs work and which don't / Quais abas funcionam e quais não
