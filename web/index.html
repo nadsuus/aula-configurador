@@ -275,9 +275,10 @@
   .paintbox { display: grid; gap: 8px; }
   .paintbox .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .colorbox input[type=color] { width: 100%; height: 110px; border: 0; padding: 0; background: none; cursor: pointer; }
-  .rgb { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .rgb { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 1.6fr); gap: 6px; }
   .rgb label { display: grid; gap: 2px; font-size: 12px; color: var(--muted); }
   .rgb input { width: 100%; font: inherit; padding: 4px 6px; border: 1px solid var(--line); border-radius: 4px; background: var(--card); color: var(--text); }
+  .rgb input.bad { border-color: var(--err); }
   .swatches { display: flex; gap: 8px; flex-wrap: wrap; }
   .swatches button { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--card); box-shadow: 0 0 0 1px var(--line); padding: 0; }
   .cm { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; justify-self: start; }
@@ -533,7 +534,7 @@
             </div>
             <div class="cm notpaint" id="cmode"><button data-c="color" class="active">Cor única</button><button data-c="mix">Multicolorido</button></div>
             <input type="color" id="lcolor" title="Escolher cor">
-            <div class="rgb"><label>R<input type="number" id="cr" min="0" max="255"></label><label>G<input type="number" id="cg" min="0" max="255"></label><label>B<input type="number" id="cb" min="0" max="255"></label></div>
+            <div class="rgb"><label>R<input type="number" id="cr" min="0" max="255"></label><label>G<input type="number" id="cg" min="0" max="255"></label><label>B<input type="number" id="cb" min="0" max="255"></label><label>Hex<input type="text" id="chex" maxlength="7" spellcheck="false" autocomplete="off" title="Cor em hexadecimal, por exemplo #ff8800"></label></div>
             <div class="swatches" id="swatches"></div>
             <div class="notpaint">Velocidade</div>
             <div class="hs notpaint"><button class="pm" data-for="lspeed" data-d="-1">−</button><input type="range" id="lspeed" min="0" max="4" step="1"><button class="pm" data-for="lspeed" data-d="1">+</button><span class="v" id="lspeed-v"></span></div>
@@ -1735,6 +1736,14 @@ const hex2 = (n) => Number(n).toString(16).padStart(2, "0");
 function setColor(hex) {
   L().st.color = hex; $("lcolor").value = hex;
   $("cr").value = parseInt(hex.slice(1, 3), 16); $("cg").value = parseInt(hex.slice(3, 5), 16); $("cb").value = parseInt(hex.slice(5, 7), 16);
+  $("chex").value = hex; $("chex").classList.remove("bad");
+}
+// Aceita "#ff8800", "ff8800", "#f80" ou "f80"; devolve "#ff8800" ou null se nao for uma cor valida.
+function parseHex(text) {
+  const m = text.trim().replace(/^#/, "").match(/^([0-9a-f]{3}|[0-9a-f]{6})$/i);
+  if (!m) return null;
+  const h = m[1].length === 3 ? m[1].replace(/./g, "$&$&") : m[1];
+  return "#" + h.toLowerCase();
 }
 function drawModes() {
   $("modes").innerHTML = L().modes.map(([v, t]) => `<button data-v="${v}">${t}</button>`).join("");
@@ -1816,6 +1825,7 @@ function showLight() {
   $("lcolor").value = st.color;
   showLightPreview();
   $("cr").value = parseInt(st.color.slice(1, 3), 16); $("cg").value = parseInt(st.color.slice(3, 5), 16); $("cb").value = parseInt(st.color.slice(5, 7), 16);
+  if (document.activeElement !== $("chex")) { $("chex").value = st.color; $("chex").classList.remove("bad"); }
 }
 // ---- Previa no desenho: cor, brilho e efeito configurados ----
 // Efeitos agrupados pelo jeito de animar (aproximado; o teclado e quem desenha de verdade).
@@ -1895,6 +1905,13 @@ $("lcolor").oninput = () => { setColor($("lcolor").value); L().st.rainbow = fals
 for (const id of ["cr", "cg", "cb"]) $(id).onchange = () => {
   const v = (x) => hex2(Math.min(255, Math.max(0, Number($(x).value) || 0)));
   setColor("#" + v("cr") + v("cg") + v("cb")); L().st.rainbow = false; showLight(); applyColor();
+};
+// Hex: marca em vermelho enquanto o texto nao for uma cor; aplica ao dar Enter ou sair do campo.
+$("chex").oninput = () => $("chex").classList.toggle("bad", !parseHex($("chex").value));
+$("chex").onchange = () => {
+  const hex = parseHex($("chex").value);
+  if (!hex) { $("chex").value = L().st.color; $("chex").classList.remove("bad"); return; } // texto invalido: volta para a cor atual
+  setColor(hex); L().st.rainbow = false; showLight(); applyColor();
 };
 for (const id of ["lspeed", "lbright"]) {
   $(id).oninput = () => { L().st[id === "lspeed" ? "speed" : "bright"] = Number($(id).value); showLight(); };
